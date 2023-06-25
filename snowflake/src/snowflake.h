@@ -1,3 +1,5 @@
 #pragma once
 
-bool SnowflakeInit();
+#include "defines.h"
+
+SAPI bool SnowflakeInit();
