@@ -8,6 +8,7 @@ math(EXPR platform_bits "${CMAKE_SIZEOF_VOID_P} * 8")
 set(project_platform_binary_dir ${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/$<CONFIG>-x${platform_bits})
 # Set .dll/.exe files directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${project_platform_binary_dir})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${project_platform_binary_dir})
 
 # Setup cache directory
 set(CMAKE_BUILD_FILES_DIRECTORY ${CMAKE_SOURCE_DIR}/intermediate/${PROJECT_NAME}/$<CONFIG>-x${platform_bits})
