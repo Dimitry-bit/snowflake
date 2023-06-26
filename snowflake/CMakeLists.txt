@@ -8,8 +8,8 @@ set_target_properties(snowflake PROPERTIES
         DEBUG_POSTFIX "-d"
         CXX_VISIBILITY_PRESET hidden
         VISIBILITY_INLINES_HIDDEN YES)
-target_link_libraries(snowflake INTERFACE ${OPENGL_LIBRARY} glfw glew32s)
-target_include_directories(snowflake INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_link_libraries(snowflake PUBLIC ${OPENGL_LIBRARY} glfw glew32s)
+target_include_directories(snowflake PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 target_compile_options(snowflake PRIVATE
         -Wall -Wextra -Wpedantic -Wuninitialized -Werror=pointer-arith
@@ -17,10 +17,14 @@ target_compile_options(snowflake PRIVATE
         -Wdouble-promotion -Wfloat-equal
         -Wundef -Wshadow -Wno-unused-variable -Wunused-label -Wno-array-bounds -Wno-infinite-recursion)
 
-target_compile_options(snowflake PRIVATE
-        -DSNOWFLAKE_EXPORT
+
+target_compile_options(snowflake PUBLIC
         -DASSERTION_ENABLED
         "$<$<CONFIG:RELEASE>:-DSNOWFLAKE_RELEASE>"
         "$<$<CONFIG:DEBUG>:-DSNOWFLAKE_DEBUG>")
+
+target_compile_options(snowflake PRIVATE
+        -DASSERTION_ENABLED
+        -DSNOWFLAKE_EXPORT)
 
 add_subdirectory(vendor)
