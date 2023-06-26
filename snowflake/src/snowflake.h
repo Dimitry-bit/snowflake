@@ -3,6 +3,7 @@
 #include "defines.h"
 #include "sassert.h"
 #include "logger.h"
+#include "smath.h"
 
 enum SAPI ConfigFlags {
     FLAG_WINDOW_VSYNC_HINT = 1 << 1,
@@ -25,9 +26,11 @@ SAPI void MinimizeWindow();
 SAPI void SetWindowTitle(const char* title);
 SAPI void SetWindowPosition(i32 x, i32 y);
 SAPI void SetWindowSize(i32 width, i32 height);
+SAPI Vec2 GetWindowSize();
+SAPI Vec2 GetWindowPosition();
 
-SAPI i32 GetScreenWidth();
-SAPI i32 GetScreenHeight();
+SAPI i32 GetWindowWidth();
+SAPI i32 GetWindowHeight();
 
 SAPI void PollInputEvents();
 

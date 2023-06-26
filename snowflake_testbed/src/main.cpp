@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "snowflake.h"
 
 int main()
@@ -10,7 +11,7 @@ int main()
 
     SASSERT(IsWindowState(configFlags) == true);
 
-    LOG_INFO("Screen Size: %dx%d", GetScreenWidth(), GetScreenHeight());
+    LOG_INFO("Screen Size: %dx%d", (i32) GetWindowSize().x, (i32) GetWindowSize().y);
 
     SASSERT(IsWindowHidden() == false);
     SASSERT(IsWindowFullscreen() == false);
@@ -21,9 +22,9 @@ int main()
     SASSERT(IsVsyncEnabled() == false);
 
     SetWindowSize(1280, 720);
-    LOG_INFO("Screen Size: %dx%d", GetScreenWidth(), GetScreenHeight());
-    SASSERT(GetScreenWidth() == 1280);
-    SASSERT(GetScreenHeight() == 720);
+    LOG_INFO("Screen Size: %dx%d", (i32) GetWindowSize().x, (i32) GetWindowSize().y);
+    SASSERT(GetWindowWidth() == 1280);
+    SASSERT(GetWindowHeight() == 720);
 
     SetWindowPosition(100, 100);
     MaximizeWindow();
@@ -37,6 +38,11 @@ int main()
     EnableCursor();
 
     while (!WindowShouldClose()) {
+
+        char title[32] = { 0 };
+        snprintf(title, 32, "%g,%g", GetWindowPosition().x, GetWindowPosition().y);
+        SetWindowTitle(title);
+
         PollInputEvents();
     }
 

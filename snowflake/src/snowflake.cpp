@@ -147,7 +147,29 @@ void SetWindowSize(i32 width, i32 height)
     glfwSetWindowSize(windowHandle, width, height);
 }
 
-i32 GetScreenWidth()
+SAPI Vec2 GetWindowSize()
+{
+    SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
+
+    int width = 0;
+    int height = 0;
+    glfwGetWindowSize(windowHandle, &width, &height);
+    Vec2 size = { (f32) width, (f32) height };
+    return size;
+}
+
+SAPI Vec2 GetWindowPosition()
+{
+    SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
+
+    int x = 0;
+    int y = 0;
+    glfwGetWindowPos(windowHandle, &x, &y);
+    Vec2 position = { (f32) x, (f32) y };
+    return position;
+}
+
+i32 GetWindowWidth()
 {
     SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
 
@@ -156,7 +178,7 @@ i32 GetScreenWidth()
     return width;
 }
 
-i32 GetScreenHeight()
+i32 GetWindowHeight()
 {
     SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
 
