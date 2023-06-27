@@ -4,11 +4,21 @@
 #include "snowflake.h"
 
 #define ERROR_STR_WINDOW_INIT "Window is not initialized, Invoke InitWindow()"
+#define MAX_KEYBOARD_KEYS 512
+#define MAX_MOUSE_BUTTONS 8
 
 static void WindowSizeCallback(GLFWwindow* window, i32 width, i32 height);
+static void KeyCallback(GLFWwindow* window, i32 key, i32 scancode, i32 action, i32 mods);
+static void MouseButtonCallback(GLFWwindow* window, i32 button, i32 action, i32 mods);
+static void MouseScrollCallback(GLFWwindow* window, f64 xOffset, f64 yOffset);
 
 static GLFWwindow* windowHandle = nullptr;
 static i32 configFlags = 0;
+static bool8 prevKeyState[MAX_KEYBOARD_KEYS] = { false };
+static bool8 currentKeyState[MAX_KEYBOARD_KEYS] = { false };
+static bool8 prevMouseButtonState[MAX_MOUSE_BUTTONS] = { false };
+static bool8 currentMouseButtonState[MAX_MOUSE_BUTTONS] = { false };
+static Vec2 mouseWheelMovement = { 0 };
 
 bool8 InitWindow(const char* title, i32 width, i32 height, i32 cFlags)
 {
@@ -43,6 +53,9 @@ bool8 InitWindow(const char* title, i32 width, i32 height, i32 cFlags)
 
     glfwMakeContextCurrent(windowHandle);
     glfwSetWindowSizeCallback(windowHandle, WindowSizeCallback);
+    glfwSetKeyCallback(windowHandle, KeyCallback);
+    glfwSetMouseButtonCallback(windowHandle, MouseButtonCallback);
+    glfwSetScrollCallback(windowHandle, MouseScrollCallback);
 
     if ((configFlags & FLAG_WINDOW_RESIZEABLE) > 0) {
         glfwSetWindowAttrib(windowHandle, GLFW_RESIZABLE, GLFW_TRUE);
@@ -79,6 +92,18 @@ void CloseWindow()
 
     windowHandle = nullptr;
     configFlags = 0;
+
+    for (u32 i = 0; i < MAX_KEYBOARD_KEYS; ++i) {
+        prevKeyState[i] = false;
+        currentKeyState[i] = false;
+    }
+
+    for (u32 i = 0; i < MAX_MOUSE_BUTTONS; ++i) {
+        prevMouseButtonState[i] = false;
+        currentMouseButtonState[i] = false;
+    }
+
+    mouseWheelMovement = Vector2Zero();
 }
 
 bool8 WindowShouldClose()
@@ -192,6 +217,17 @@ i32 GetWindowHeight()
 void PollInputEvents()
 {
     SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
+
+    for (u32 i = 0; i < MAX_KEYBOARD_KEYS; ++i) {
+        prevKeyState[i] = currentKeyState[i];
+    }
+
+    for (u32 i = 0; i < MAX_MOUSE_BUTTONS; ++i) {
+        prevMouseButtonState[i] = currentMouseButtonState[i];
+    }
+
+    mouseWheelMovement = Vector2Zero();
+
     glfwPollEvents();
 }
 
@@ -262,7 +298,85 @@ bool8 IsVsyncEnabled()
     return ((configFlags & FLAG_WINDOW_VSYNC_HINT) > 0);
 }
 
+bool8 IsKeyPressed(KeyboardKey key)
+{
+    return (!prevKeyState[key] && currentKeyState[key]);
+}
+
+bool8 IsKeyReleased(KeyboardKey key)
+{
+    return (prevKeyState[key] && !currentKeyState[key]);
+}
+
+bool8 IsKeyDown(KeyboardKey key)
+{
+    return (currentKeyState[key]);
+}
+
+bool8 IsKeyUp(KeyboardKey key)
+{
+    return (!currentKeyState[key]);
+}
+
+Vec2 GetMousePosition()
+{
+    SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
+
+    f64 xPos = 0;
+    f64 yPos = 0;
+    glfwGetCursorPos(windowHandle, &xPos, &yPos);
+    Vec2 mousePosition = { (f32) xPos, (f32) yPos };
+    return mousePosition;
+}
+
+Vec2 GetMouseWheel()
+{
+    return mouseWheelMovement;
+}
+
+bool8 IsMousePressed(MouseButton button)
+{
+    return (!prevMouseButtonState[button] && currentMouseButtonState[button]);
+}
+
+bool8 IsMouseReleased(MouseButton button)
+{
+    return (prevMouseButtonState[button] && !currentMouseButtonState[button]);
+}
+
+bool8 IsMouseDown(MouseButton button)
+{
+    return (currentMouseButtonState[button]);
+}
+
+bool8 IsMouseUp(MouseButton button)
+{
+    return (!currentMouseButtonState[button]);
+}
+
 static void WindowSizeCallback(GLFWwindow* window, i32 width, i32 height)
 {
     // NOTE(Tony): Implement WindowSizeCallback()
+}
+
+static void KeyCallback(GLFWwindow* window, i32 key, i32 scancode, i32 action, i32 mods)
+{
+    // NOTE: KEY_UNKNOWN = -1
+    if (key < 0) {
+        LOG_WARN("Unknown key: %d", key);
+        return;
+    }
+
+    currentKeyState[key] = (action != GLFW_RELEASE);
+}
+
+static void MouseButtonCallback(GLFWwindow* window, i32 button, i32 action, i32 mods)
+{
+    currentMouseButtonState[button] = (action != GLFW_RELEASE);
+}
+
+static void MouseScrollCallback(GLFWwindow* window, f64 xOffset, f64 yOffset)
+{
+    mouseWheelMovement.x = (f32) xOffset;
+    mouseWheelMovement.y = (f32) yOffset;
 }

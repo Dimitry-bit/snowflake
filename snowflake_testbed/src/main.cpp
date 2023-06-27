@@ -39,9 +39,32 @@ int main()
 
     while (!WindowShouldClose()) {
 
-        char title[32] = { 0 };
-        snprintf(title, 32, "%g,%g", GetWindowPosition().x, GetWindowPosition().y);
-        SetWindowTitle(title);
+        {
+            char title[120] = { 0 };
+            snprintf(title, 120, "W:%g,%g, M:%g,%g",
+                     GetWindowPosition().x, GetWindowPosition().y,
+                     GetMousePosition().x, GetMousePosition().y);
+            SetWindowTitle(title);
+        }
+
+        {
+            if (IsKeyPressed(KEY_1)) {
+                LOG_INFO("'%d' Key is Pressed", KEY_1);
+            }
+            if (IsKeyReleased(KEY_1)) {
+                LOG_INFO("'%d' Key is Released", KEY_1);
+            }
+
+            if (IsMousePressed(MOUSE_BUTTON_LEFT)) {
+                LOG_INFO("'%d' Key is Pressed", MOUSE_BUTTON_LEFT);
+            }
+            if (IsMouseReleased(MOUSE_BUTTON_LEFT)) {
+                LOG_INFO("'%d' Key is Released", MOUSE_BUTTON_LEFT);
+            }
+            if (GetMouseWheel().y > 0 || GetMouseWheel().y < 0) {
+                LOG_INFO("MouseWheel move %f", GetMouseWheel().y);
+            }
+        }
 
         PollInputEvents();
     }
