@@ -57,6 +57,18 @@ union SAPI Vec4 {
     }
 };
 
+static inline Vec2 Vector2Zero()
+{
+    Vec2 result = { 0 };
+    return result;
+}
+
+static inline Vec2 Vector2One()
+{
+    Vec2 result = { 1.0f, 1.0f };
+    return result;
+}
+
 static inline Vec2 Vector2Add(const Vec2& v1, const Vec2& v2)
 {
     Vec2 result = {
@@ -262,6 +274,18 @@ inline Vec2& operator/=(Vec2& left, const f32& right)
 inline Vec2 operator-(const Vec2& right)
 {
     Vec2 result = Vector2Negate(right);
+    return result;
+}
+
+static inline Vec3 Vector3Zero()
+{
+    Vec3 result = { 0 };
+    return result;
+}
+
+static inline Vec3 Vector3One()
+{
+    Vec3 result = { 1.0f, 1.0f, 1.0f };
     return result;
 }
 
@@ -473,6 +497,18 @@ inline Vec3& operator/=(Vec3& left, const f32& right)
 inline Vec3 operator-(const Vec3& right)
 {
     Vec3 result = Vector3Negate(right);
+    return result;
+}
+
+static inline Vec4 Vector4Zero()
+{
+    Vec4 result = { 0 };
+    return result;
+}
+
+static inline Vec4 Vector4One()
+{
+    Vec4 result = { 1.0f, 1.0f, 1.0f, 1.0f };
     return result;
 }
 
