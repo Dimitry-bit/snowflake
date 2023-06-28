@@ -4,6 +4,8 @@
 #include "sassert.h"
 #include "logger.h"
 #include "smath.h"
+#include "utils.h"
+#include "color.h"
 
 enum SAPI KeyboardKey {
 /* Printable keys */
@@ -169,6 +171,7 @@ SAPI void SetWindowPosition(i32 x, i32 y);
 SAPI void SetWindowSize(i32 width, i32 height);
 SAPI Vec2 GetWindowSize();
 SAPI Vec2 GetWindowPosition();
+SAPI void* GetGLFWwindowHandle();
 
 SAPI i32 GetWindowWidth();
 SAPI i32 GetWindowHeight();
@@ -183,7 +186,7 @@ SAPI void DisableCursor();
 
 SAPI f64 GetTime();
 SAPI f32 GetFrameTime();
-SAPI i32 GetFPS();
+SAPI u32 GetFPS();
 
 SAPI void EnableVsync();
 SAPI void DisableVsync();
@@ -200,3 +203,6 @@ SAPI bool8 IsMousePressed(MouseButton button);
 SAPI bool8 IsMouseReleased(MouseButton button);
 SAPI bool8 IsMouseDown(MouseButton button);
 SAPI bool8 IsMouseUp(MouseButton button);
+
+SAPI void BeginDrawing();
+SAPI void EndDrawing();

@@ -1,11 +1,25 @@
+#include <cstring>
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 
 #include "snowflake.h"
+#include "srenderer_internal.h"
 
 #define ERROR_STR_WINDOW_INIT "Window is not initialized, Invoke InitWindow()"
 #define MAX_KEYBOARD_KEYS 512
 #define MAX_MOUSE_BUTTONS 8
+
+struct STime {
+    f32 currentFrameTime;
+    f32 prevFrameTime;
+    f32 deltaTime;
+};
+
+struct FPS {
+    f32 timer;
+    u32 frameCounter;
+    u32 fps;
+};
 
 static void WindowSizeCallback(GLFWwindow* window, i32 width, i32 height);
 static void KeyCallback(GLFWwindow* window, i32 key, i32 scancode, i32 action, i32 mods);
@@ -14,11 +28,17 @@ static void MouseScrollCallback(GLFWwindow* window, f64 xOffset, f64 yOffset);
 
 static GLFWwindow* windowHandle = nullptr;
 static i32 configFlags = 0;
+
 static bool8 prevKeyState[MAX_KEYBOARD_KEYS] = { false };
 static bool8 currentKeyState[MAX_KEYBOARD_KEYS] = { false };
 static bool8 prevMouseButtonState[MAX_MOUSE_BUTTONS] = { false };
 static bool8 currentMouseButtonState[MAX_MOUSE_BUTTONS] = { false };
-static Vec2 mouseWheelMovement = { 0 };
+static Vec2 mouseWheelMovement = { };
+
+static STime time = { };
+static FPS fps = { };
+
+static bool8 isDrawing = false;
 
 bool8 InitWindow(const char* title, i32 width, i32 height, i32 cFlags)
 {
@@ -30,6 +50,8 @@ bool8 InitWindow(const char* title, i32 width, i32 height, i32 cFlags)
     if (!glfwInit()) {
         LOG_FATAL("Failed to initialize GLFW");
         return false;
+    } else {
+        LOG_TRACE("GLFW initialized successfully");
     }
 
     configFlags = cFlags;
@@ -49,6 +71,8 @@ bool8 InitWindow(const char* title, i32 width, i32 height, i32 cFlags)
         LOG_FATAL("Failed to create GLFW windowHandle");
         glfwTerminate();
         return false;
+    } else {
+        LOG_TRACE("GLFW window created successfully");
     }
 
     glfwMakeContextCurrent(windowHandle);
@@ -83,6 +107,16 @@ bool8 InitWindow(const char* title, i32 width, i32 height, i32 cFlags)
         LOG_INFO("OpenGL Profile: Compatibility");
     }
 
+    if (glewInit() != GLEW_OK) {
+        LOG_FATAL("Failed to initialize GLEW");
+        CloseWindow();
+        return false;
+    } else {
+        LOG_TRACE("GLEW initialized successfully");
+    }
+
+    LOG_INFO("Snowflake initialized successfully");
+
     return true;
 }
 
@@ -104,6 +138,11 @@ void CloseWindow()
     }
 
     mouseWheelMovement = Vector2Zero();
+
+    memset(&time, 0, sizeof(time));
+    memset(&fps, 0, sizeof(FPS));
+
+    LOG_INFO("Snowflake window closed successfully");
 }
 
 bool8 WindowShouldClose()
@@ -214,6 +253,12 @@ i32 GetWindowHeight()
     return height;
 }
 
+void* GetGLFWwindowHandle()
+{
+    SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
+    return windowHandle;
+}
+
 void PollInputEvents()
 {
     SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
@@ -235,12 +280,16 @@ void ShowCursor()
 {
     SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
     glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+    LOG_TRACE("CursorState: Show");
 }
 
 void HideCursor()
 {
     SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
     glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
+    LOG_TRACE("CursorState: Hidden");
 }
 
 bool8 IsCursorHidden()
@@ -253,12 +302,16 @@ void EnableCursor()
 {
     SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
     glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+    LOG_TRACE("CursorState: Normal");
 }
 
 void DisableCursor()
 {
     SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
     glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    LOG_TRACE("CursorState: Disabled");
 }
 
 f64 GetTime()
@@ -269,14 +322,12 @@ f64 GetTime()
 
 f32 GetFrameTime()
 {
-    // TODO(Tony): Implement GetFrameTime() !!
-    return 0.0f;
+    return time.deltaTime;
 }
 
-i32 GetFPS()
+u32 GetFPS()
 {
-    // TODO(Tony): Implement GetFPS() !!
-    return 0;
+    return fps.fps;
 }
 
 void EnableVsync()
@@ -284,6 +335,8 @@ void EnableVsync()
     SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
     glfwSwapInterval(1);
     configFlags |= FLAG_WINDOW_VSYNC_HINT;
+
+    LOG_INFO("Vsync: Enabled");
 }
 
 void DisableVsync()
@@ -291,6 +344,8 @@ void DisableVsync()
     SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
     glfwSwapInterval(0);
     configFlags &= ~FLAG_WINDOW_VSYNC_HINT;
+
+    LOG_INFO("Vsync: Disabled");
 }
 
 bool8 IsVsyncEnabled()
@@ -356,7 +411,8 @@ bool8 IsMouseUp(MouseButton button)
 
 static void WindowSizeCallback(GLFWwindow* window, i32 width, i32 height)
 {
-    // NOTE(Tony): Implement WindowSizeCallback()
+    GLCall(glViewport(0, 0, width, height));
+    LOG_TRACE("WindowResizeCallback: (NewWidth:%d, NewHeight:%d)", width, height);
 }
 
 static void KeyCallback(GLFWwindow* window, i32 key, i32 scancode, i32 action, i32 mods)
@@ -379,4 +435,35 @@ static void MouseScrollCallback(GLFWwindow* window, f64 xOffset, f64 yOffset)
 {
     mouseWheelMovement.x = (f32) xOffset;
     mouseWheelMovement.y = (f32) yOffset;
+}
+
+void BeginDrawing()
+{
+    SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
+    SASSERT_MSG(!isDrawing, "Can't call 'BeginDrawing()' more than once")
+
+    isDrawing = true;
+
+    time.currentFrameTime = (f32) glfwGetTime();
+    time.deltaTime = time.currentFrameTime - time.prevFrameTime;
+    time.prevFrameTime = time.currentFrameTime;
+}
+
+void EndDrawing()
+{
+    SASSERT_MSG(windowHandle, ERROR_STR_WINDOW_INIT);
+    SASSERT_MSG(isDrawing, "Can't call 'EndDrawing()' more than once");
+
+    isDrawing = false;
+
+    glfwSwapBuffers((GLFWwindow*) GetGLFWwindowHandle());
+
+    fps.frameCounter++;
+    fps.timer += time.deltaTime;
+
+    if (fps.timer >= 1.0f) {
+        fps.fps = (u32) ((f32) fps.frameCounter / fps.timer);
+        fps.timer = 0.0f;
+        fps.frameCounter = 0;
+    }
 }
