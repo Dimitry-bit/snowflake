@@ -42,7 +42,7 @@ char* LoadFile(const char* filePath)
 
         data[len] = '\0';
         fclose(fp);
-        LOG_INFO("'%s' File loaded successfully", filePath);
+        LOG_TRACE("'%s' File loaded successfully", filePath);
     }
 
     return data;
