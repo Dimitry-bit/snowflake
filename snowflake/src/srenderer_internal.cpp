@@ -391,8 +391,8 @@ static u32 ShaderCompile(u32 type, char* source)
 void ShaderSetUniform1f(Shader* shader, const char* uniformName, f32 v)
 {
     ShaderBind(shader);
-    int location = ShaderGetUniformLocation(shader, uniformName);
-    if (location > 0) {
+    i32 location = ShaderGetUniformLocation(shader, uniformName);
+    if (location != -1) {
         GLCall(glUniform1f(location, v));
     }
 }
@@ -400,8 +400,8 @@ void ShaderSetUniform1f(Shader* shader, const char* uniformName, f32 v)
 void ShaderSetUniform2f(Shader* shader, const char* uniformName, f32 v0, f32 v1)
 {
     ShaderBind(shader);
-    int location = ShaderGetUniformLocation(shader, uniformName);
-    if (location > 0) {
+    i32 location = ShaderGetUniformLocation(shader, uniformName);
+    if (location != -1) {
         GLCall(glUniform2f(location, v0, v1));
     }
 }
@@ -409,8 +409,8 @@ void ShaderSetUniform2f(Shader* shader, const char* uniformName, f32 v0, f32 v1)
 void ShaderSetUniform2f(Shader* shader, const char* uniformName, Vec2 v)
 {
     ShaderBind(shader);
-    int location = ShaderGetUniformLocation(shader, uniformName);
-    if (location > 0) {
+    i32 location = ShaderGetUniformLocation(shader, uniformName);
+    if (location != -1) {
         GLCall(glUniform2fv(location, 2, v.f));
     }
 }
@@ -418,8 +418,8 @@ void ShaderSetUniform2f(Shader* shader, const char* uniformName, Vec2 v)
 void ShaderSetUniform3f(Shader* shader, const char* uniformName, f32 v0, f32 v1, f32 v2)
 {
     ShaderBind(shader);
-    int location = ShaderGetUniformLocation(shader, uniformName);
-    if (location > 0) {
+    i32 location = ShaderGetUniformLocation(shader, uniformName);
+    if (location != -1) {
         GLCall(glUniform3f(location, v0, v1, v2));
     }
 }
@@ -427,8 +427,8 @@ void ShaderSetUniform3f(Shader* shader, const char* uniformName, f32 v0, f32 v1,
 void ShaderSetUniform3f(Shader* shader, const char* uniformName, Vec3 v)
 {
     ShaderBind(shader);
-    int location = ShaderGetUniformLocation(shader, uniformName);
-    if (location > 0) {
+    i32 location = ShaderGetUniformLocation(shader, uniformName);
+    if (location != -1) {
         GLCall(glUniform3fv(location, 3, v.f));
     }
 }
@@ -436,8 +436,8 @@ void ShaderSetUniform3f(Shader* shader, const char* uniformName, Vec3 v)
 void ShaderSetUniform4f(Shader* shader, const char* uniformName, f32 v0, f32 v1, f32 v2, f32 v3)
 {
     ShaderBind(shader);
-    int location = ShaderGetUniformLocation(shader, uniformName);
-    if (location > 0) {
+    i32 location = ShaderGetUniformLocation(shader, uniformName);
+    if (location != -1) {
         GLCall(glUniform4f(location, v0, v1, v2, v3));
     }
 }
@@ -445,8 +445,8 @@ void ShaderSetUniform4f(Shader* shader, const char* uniformName, f32 v0, f32 v1,
 void ShaderSetUniform4f(Shader* shader, const char* uniformName, Vec4 v)
 {
     ShaderBind(shader);
-    int location = ShaderGetUniformLocation(shader, uniformName);
-    if (location > 0) {
+    i32 location = ShaderGetUniformLocation(shader, uniformName);
+    if (location != -1) {
         GLCall(glUniform4fv(location, 4, v.f));
     }
 }
@@ -454,8 +454,8 @@ void ShaderSetUniform4f(Shader* shader, const char* uniformName, Vec4 v)
 void ShaderSetUniform1i(Shader* shader, const char* uniformName, i32 v)
 {
     ShaderBind(shader);
-    int location = ShaderGetUniformLocation(shader, uniformName);
-    if (location > 0) {
+    i32 location = ShaderGetUniformLocation(shader, uniformName);
+    if (location != -1) {
         GLCall(glUniform1i(location, v));
     }
 }
