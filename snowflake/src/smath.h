@@ -57,6 +57,54 @@ union SAPI Vec4 {
     }
 };
 
+// Row-Major order
+union SAPI Mat2 {
+    f32 f[2][2];
+
+    struct {
+        f32 m0, m1;
+        f32 m2, m3;
+    };
+
+    inline f32* operator[](const i32& index)
+    {
+        return f[index];
+    }
+};
+
+// Row-Major order
+union SAPI Mat3 {
+    f32 f[3][3];
+
+    struct {
+        f32 m0, m1, m2;
+        f32 m3, m4, m5;
+        f32 m6, m7, m8;
+    };
+
+    inline f32* operator[](const i32& index)
+    {
+        return f[index];
+    }
+};
+
+// Row-Major order
+union SAPI Mat4 {
+    f32 f[4][4];
+
+    struct {
+        f32 m0, m1, m2, m3;
+        f32 m4, m5, m6, m7;
+        f32 m8, m9, m10, m11;
+        f32 m12, m13, m14, m15;
+    };
+
+    inline f32* operator[](const i32& index)
+    {
+        return f[index];
+    }
+};
+
 static inline Vec2 Vector2Zero()
 {
     Vec2 result = { 0 };
@@ -593,14 +641,14 @@ static inline Vec4 Vector4DivideValue(const Vec4& v, const f32& f)
 static inline f32 Vector4Distance(const Vec4& v1, const Vec4& v2)
 {
     f32 result = sqrtf((v2.x - v1.x) * (v2.x - v1.x) + (v2.y - v1.y) * (v2.y - v1.y) + (v2.z - v1.z) * (v2.z - v1.z) +
-        (v2.w - v1.w) * (v2.w - v1.w));
+                       (v2.w - v1.w) * (v2.w - v1.w));
     return result;
 }
 
 static inline f32 Vector4DistanceSqr(const Vec4& v1, const Vec4& v2)
 {
     f32 result = (v2.x - v1.x) * (v2.x - v1.x) + (v2.y - v1.y) * (v2.y - v1.y) + (v2.z - v1.z) * (v2.z - v1.z) +
-        (v2.w - v1.w) * (v2.w - v1.w);
+                 (v2.w - v1.w) * (v2.w - v1.w);
     return result;
 }
 
@@ -731,4 +779,691 @@ inline Vec4 operator-(const Vec4& right)
 {
     Vec4 result = Vector4Negate(right);
     return result;
+}
+
+static inline Mat2 Matrix2Identity()
+{
+    Mat2 result = {
+        1.0f, 0.0f,
+        0.0f, 1.0f
+    };
+
+    return result;
+}
+
+static inline f32 Matrix2Determinant(Mat2 mat)
+{
+    f32 result = 0.0f;
+
+    result = mat.m0 * mat.m3 - mat.m1 * mat.m2;
+    return result;
+}
+
+static inline Mat2 Matrix2Transpose(Mat2 mat)
+{
+    Mat2 result = { 0 };
+
+    result.m0 = mat.m0;
+    result.m1 = mat.m2;
+    result.m2 = mat.m1;
+    result.m3 = mat.m3;
+
+    return result;
+}
+
+static inline Mat2 Matrix2Add(Mat2 left, Mat2 right)
+{
+    Mat2 result = { 0 };
+
+    result.m0 = left.m0 + right.m0;
+    result.m1 = left.m1 + right.m1;
+    result.m2 = left.m2 + right.m2;
+    result.m3 = left.m3 + right.m3;
+
+    return result;
+}
+
+static inline Mat2 Matrix2Subtract(Mat2 left, Mat2 right)
+{
+    Mat2 result = { 0 };
+
+    result.m0 = left.m0 - right.m0;
+    result.m1 = left.m1 - right.m1;
+    result.m2 = left.m2 - right.m2;
+    result.m3 = left.m3 - right.m3;
+
+    return result;
+}
+
+static inline Mat2 Matrix2Multiply(Mat2 left, Mat2 right)
+{
+    Mat2 result = { 0 };
+
+    result.m0 = left.m0 * right.m0 + left.m1 * right.m2;
+    result.m1 = left.m0 * right.m1 + left.m1 * right.m3;
+    result.m2 = left.m2 * right.m0 + left.m3 * right.m2;
+    result.m3 = left.m2 * right.m1 + left.m3 * right.m3;
+
+    return result;
+}
+
+static inline Mat2 Matrix2MultiplyValue(Mat2 mat, f32 f)
+{
+    Mat2 result = { 0 };
+
+    result.m0 = mat.m0 * f;
+    result.m1 = mat.m1 * f;
+    result.m2 = mat.m2 * f;
+    result.m3 = mat.m3 * f;
+
+    return result;
+}
+
+static inline Mat2 Matrix2Inverse(Mat2 mat)
+{
+    Mat2 result = { 0 };
+
+    f32 invertDet = 1.0f / Matrix2Determinant(mat);
+
+    result.m0 = mat.m3 * invertDet;
+    result.m1 = -mat.m1 * invertDet;
+    result.m2 = -mat.m2 * invertDet;
+    result.m3 = mat.m0 * invertDet;
+
+    return result;
+}
+
+inline Mat2 operator+(const Mat2& left, const Mat2& right)
+{
+    Mat2 result = Matrix2Add(left, right);
+    return result;
+}
+
+inline Mat2& operator+=(Mat2& left, const Mat2& right)
+{
+    left = Matrix2Add(left, right);
+    return left;
+}
+
+inline Mat2 operator-(const Mat2& left, const Mat2& right)
+{
+    Mat2 result = Matrix2Subtract(left, right);
+    return result;
+}
+
+inline Mat2& operator-=(Mat2& left, const Mat2& right)
+{
+    left = Matrix2Subtract(left, right);
+    return left;
+}
+
+inline Mat2 operator*(const Mat2& left, const Mat2& right)
+{
+    Mat2 result = Matrix2Multiply(left, right);
+    return result;
+}
+
+inline Mat2& operator*=(Mat2& left, const Mat2& right)
+{
+    left = Matrix2Multiply(left, right);
+    return left;
+}
+
+inline Mat2 operator*(const Mat2& left, const f32& right)
+{
+    Mat2 result = Matrix2MultiplyValue(left, right);
+    return result;
+}
+
+inline Mat2 operator*(const f32& left, const Mat2& right)
+{
+    Mat2 result = Matrix2MultiplyValue(right, left);
+    return result;
+}
+
+inline Mat2& operator*=(Mat2& left, const f32& right)
+{
+    left = Matrix2MultiplyValue(left, right);
+    return left;
+}
+
+static inline Mat3 Matrix3Identity()
+{
+    Mat3 result = {
+        1.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f
+    };
+
+    return result;
+}
+
+static inline f32 Matrix3Determinant(Mat3 mat)
+{
+    f32 result = mat.m0 * mat.m4 * mat.m8 - mat.m0 * mat.m5 * mat.m7 -
+                 mat.m1 * mat.m3 * mat.m8 + mat.m1 * mat.m5 * mat.m6 +
+                 mat.m2 * mat.m3 * mat.m7 - mat.m2 * mat.m4 * mat.m6;
+
+    return result;
+}
+
+static inline Mat3 Matrix3Transpose(Mat3 mat)
+{
+    Mat3 result = { 0 };
+
+    result.m0 = mat.m0;
+    result.m1 = mat.m3;
+    result.m2 = mat.m6;
+    result.m3 = mat.m1;
+    result.m4 = mat.m4;
+    result.m5 = mat.m7;
+    result.m6 = mat.m2;
+    result.m7 = mat.m5;
+    result.m8 = mat.m8;
+
+    return result;
+}
+
+static inline Mat3 Matrix3Add(Mat3 left, Mat3 right)
+{
+    Mat3 result = { 0 };
+
+    result.m0 = left.m0 + right.m0;
+    result.m1 = left.m1 + right.m1;
+    result.m2 = left.m2 + right.m2;
+    result.m3 = left.m3 + right.m3;
+    result.m4 = left.m4 + right.m4;
+    result.m5 = left.m5 + right.m5;
+    result.m6 = left.m6 + right.m6;
+    result.m7 = left.m7 + right.m7;
+    result.m8 = left.m8 + right.m8;
+
+    return result;
+}
+
+static inline Mat3 Matrix3Subtract(Mat3 left, Mat3 right)
+{
+    Mat3 result = { 0 };
+
+    result.m0 = left.m0 - right.m0;
+    result.m1 = left.m1 - right.m1;
+    result.m2 = left.m2 - right.m2;
+    result.m3 = left.m3 - right.m3;
+    result.m4 = left.m4 - right.m4;
+    result.m5 = left.m5 - right.m5;
+    result.m6 = left.m6 - right.m6;
+    result.m7 = left.m7 - right.m7;
+    result.m8 = left.m8 - right.m8;
+
+    return result;
+}
+
+static inline Mat3 Matrix3Multiply(Mat3 left, Mat3 right)
+{
+    Mat3 result = { 0 };
+
+    result.m0 = left.m0 * right.m0 + left.m1 * right.m3 + left.m2 * right.m6;
+    result.m1 = left.m0 * right.m1 + left.m1 * right.m4 + left.m2 * right.m7;
+    result.m2 = left.m0 * right.m2 + left.m1 * right.m5 + left.m2 * right.m8;
+    result.m3 = left.m3 * right.m0 + left.m4 * right.m3 + left.m5 * right.m6;
+    result.m4 = left.m3 * right.m1 + left.m4 * right.m4 + left.m5 * right.m7;
+    result.m5 = left.m3 * right.m2 + left.m4 * right.m5 + left.m5 * right.m8;
+    result.m6 = left.m6 * right.m0 + left.m7 * right.m3 + left.m8 * right.m6;
+    result.m7 = left.m6 * right.m1 + left.m7 * right.m4 + left.m8 * right.m7;
+    result.m8 = left.m6 * right.m2 * left.m7 * right.m5 + left.m8 * right.m8;
+
+    return result;
+}
+
+static inline Mat3 Matrix3MultiplyValue(Mat3 mat, f32 f)
+{
+    Mat3 result = { 0 };
+
+    result.m0 = mat.m0 * f;
+    result.m1 = mat.m1 * f;
+    result.m2 = mat.m2 * f;
+    result.m3 = mat.m3 * f;
+    result.m4 = mat.m4 * f;
+    result.m5 = mat.m5 * f;
+    result.m6 = mat.m6 * f;
+    result.m7 = mat.m7 * f;
+    result.m8 = mat.m8 * f;
+
+    return result;
+}
+
+static inline Mat3 Matrix3Inverse(Mat3 mat)
+{
+    Mat3 result = { 0 };
+
+    f32 det = mat.m0 * mat.m4 * mat.m8 - mat.m0 * mat.m5 * mat.m7 -
+              mat.m1 * mat.m3 * mat.m8 + mat.m1 * mat.m5 * mat.m6 +
+              mat.m2 * mat.m3 * mat.m7 - mat.m2 * mat.m4 * mat.m6;
+
+    f32 invertDet = 1.0f / det;
+
+    result.m0 = (mat.m4 * mat.m8 - mat.m5 * mat.m7) * invertDet;
+    result.m3 = -(mat.m3 * mat.m8 - mat.m5 * mat.m6) * invertDet;
+    result.m6 = (mat.m3 * mat.m7 - mat.m4 * mat.m6) * invertDet;
+    result.m1 = -(mat.m1 * mat.m8 - mat.m2 * mat.m7) * invertDet;
+    result.m4 = (mat.m0 * mat.m8 - mat.m2 * mat.m6) * invertDet;
+    result.m7 = -(mat.m0 * mat.m7 - mat.m1 * mat.m6) * invertDet;
+    result.m2 = (mat.m1 * mat.m5 - mat.m2 * mat.m4) * invertDet;
+    result.m5 = -(mat.m0 * mat.m5 - mat.m2 * mat.m3) * invertDet;
+    result.m8 = (mat.m0 * mat.m4 - mat.m1 * mat.m3) * invertDet;
+
+    return result;
+}
+
+inline Mat3 operator+(const Mat3& left, const Mat3& right)
+{
+    Mat3 result = Matrix3Add(left, right);
+    return result;
+}
+
+inline Mat3& operator+=(Mat3& left, const Mat3& right)
+{
+    left = Matrix3Add(left, right);
+    return left;
+}
+
+inline Mat3 operator-(const Mat3& left, const Mat3& right)
+{
+    Mat3 result = Matrix3Subtract(left, right);
+    return result;
+}
+
+inline Mat3& operator-=(Mat3& left, const Mat3& right)
+{
+    left = Matrix3Subtract(left, right);
+    return left;
+}
+
+inline Mat3 operator*(const Mat3& left, const Mat3& right)
+{
+    Mat3 result = Matrix3Multiply(left, right);
+    return result;
+}
+
+inline Mat3& operator*=(Mat3& left, const Mat3& right)
+{
+    left = Matrix3Multiply(left, right);
+    return left;
+}
+
+inline Mat3 operator*(const Mat3& left, const f32& right)
+{
+    Mat3 result = Matrix3MultiplyValue(left, right);
+    return result;
+}
+
+inline Mat3 operator*(const f32& left, const Mat3& right)
+{
+    Mat3 result = Matrix3MultiplyValue(right, left);
+    return result;
+}
+
+inline Mat3& operator*=(Mat3& left, const f32& right)
+{
+    left = Matrix3MultiplyValue(left, right);
+    return left;
+}
+
+static inline Mat4 Matrix4Identity()
+{
+    Mat4 result = {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    return result;
+}
+
+static inline f32 Matrix4Determinant(Mat4 mat)
+{
+    // @formatter:off
+    f32 result =
+             mat.m0 * mat.m5 * mat.m10 * mat.m15 - mat.m0 * mat.m5 * mat.m11 * mat.m14 - mat.m0 * mat.m6 * mat.m9 * mat.m15 +
+             mat.m0 * mat.m6 * mat.m11 * mat.m13 + mat.m0 * mat.m7 * mat.m9 * mat.m14  - mat.m0 * mat.m7 * mat.m10 * mat.m13 -
+             mat.m1 * mat.m4 * mat.m10 * mat.m15 + mat.m1 * mat.m4 * mat.m11 * mat.m14 + mat.m1 * mat.m6 * mat.m8 * mat.m15 -
+             mat.m1 * mat.m6 * mat.m11 * mat.m12 - mat.m1 * mat.m7 * mat.m8 * mat.m14 + mat.m1 * mat.m7 * mat.m10 * mat.m12 +
+             mat.m2 * mat.m4 * mat.m9 * mat.m15 - mat.m2 * mat.m4 * mat.m11 * mat.m13 - mat.m2 * mat.m5 * mat.m8 * mat.m15 +
+             mat.m2 * mat.m5 * mat.m11 * mat.m12 + mat.m2 * mat.m7 * mat.m8 * mat.m13 - mat.m2 * mat.m7 * mat.m9 * mat.m12 -
+             mat.m3 * mat.m4 * mat.m9 * mat.m14 + mat.m3 * mat.m4 * mat.m10 * mat.m13 + mat.m3 * mat.m5 * mat.m8 * mat.m14 -
+             mat.m3 * mat.m5 * mat.m10 * mat.m12 - mat.m3 * mat.m6 * mat.m8 * mat.m13 + mat.m3 * mat.m6 * mat.m9 * mat.m12;
+    // @formatter:on
+
+    return result;
+}
+
+static inline Mat4 Matrix4Transpose(Mat4 mat)
+{
+    Mat4 result = { 0 };
+
+    result.m0 = mat.m0;
+    result.m1 = mat.m4;
+    result.m2 = mat.m8;
+    result.m3 = mat.m12;
+    result.m4 = mat.m1;
+    result.m5 = mat.m5;
+    result.m6 = mat.m9;
+    result.m7 = mat.m13;
+    result.m8 = mat.m2;
+    result.m9 = mat.m6;
+    result.m10 = mat.m10;
+    result.m11 = mat.m14;
+    result.m12 = mat.m3;
+    result.m13 = mat.m7;
+    result.m14 = mat.m11;
+    result.m15 = mat.m15;
+
+    return result;
+}
+
+static inline Mat4 Matrix4Add(Mat4 left, Mat4 right)
+{
+    Mat4 result = { 0 };
+
+    result.m0 = left.m0 + right.m0;
+    result.m1 = left.m1 + right.m1;
+    result.m2 = left.m2 + right.m2;
+    result.m3 = left.m3 + right.m3;
+    result.m4 = left.m4 + right.m4;
+    result.m5 = left.m5 + right.m5;
+    result.m6 = left.m6 + right.m6;
+    result.m7 = left.m7 + right.m7;
+    result.m8 = left.m8 + right.m8;
+    result.m9 = left.m9 + right.m9;
+    result.m10 = left.m10 + right.m10;
+    result.m11 = left.m11 + right.m11;
+    result.m12 = left.m12 + right.m12;
+    result.m13 = left.m13 + right.m13;
+    result.m14 = left.m14 + right.m14;
+    result.m15 = left.m15 + right.m15;
+
+    return result;
+}
+
+static inline Mat4 Matrix4Subtract(Mat4 left, Mat4 right)
+{
+    Mat4 result = { 0 };
+
+    result.m0 = left.m0 - right.m0;
+    result.m1 = left.m1 - right.m1;
+    result.m2 = left.m2 - right.m2;
+    result.m3 = left.m3 - right.m3;
+    result.m4 = left.m4 - right.m4;
+    result.m5 = left.m5 - right.m5;
+    result.m6 = left.m6 - right.m6;
+    result.m7 = left.m7 - right.m7;
+    result.m8 = left.m8 - right.m8;
+    result.m9 = left.m9 - right.m9;
+    result.m10 = left.m10 - right.m10;
+    result.m11 = left.m11 - right.m11;
+    result.m12 = left.m12 - right.m12;
+    result.m13 = left.m13 - right.m13;
+    result.m14 = left.m14 - right.m14;
+    result.m15 = left.m15 - right.m15;
+
+    return result;
+}
+
+static inline Mat4 Matrix4Multiply(Mat4 left, Mat4 right)
+{
+    Mat4 result = { 0 };
+
+    result.m0 = left.m0 * right.m0 + left.m1 * right.m4 + left.m2 * right.m8 + left.m3 * right.m12;
+    result.m1 = left.m0 * right.m1 + left.m1 * right.m5 + left.m2 * right.m9 + left.m3 * right.m13;
+    result.m2 = left.m0 * right.m2 + left.m1 * right.m6 + left.m2 * right.m10 + left.m3 * right.m14;
+    result.m3 = left.m0 * right.m3 + left.m1 * right.m7 + left.m2 * right.m11 + left.m3 * right.m15;
+    result.m4 = left.m4 * right.m0 + left.m5 * right.m4 + left.m6 * right.m8 + left.m7 * right.m12;
+    result.m5 = left.m4 * right.m1 + left.m5 * right.m5 + left.m6 * right.m9 + left.m7 * right.m13;
+    result.m6 = left.m4 * right.m2 + left.m5 * right.m6 + left.m6 * right.m10 + left.m7 * right.m14;
+    result.m7 = left.m4 * right.m3 + left.m5 * right.m7 + left.m6 * right.m11 + left.m7 * right.m15;
+    result.m8 = left.m8 * right.m0 + left.m9 * right.m4 + left.m10 * right.m8 + left.m11 * right.m12;
+    result.m9 = left.m8 * right.m1 + left.m9 * right.m5 + left.m10 * right.m9 + left.m11 * right.m13;
+    result.m10 = left.m8 * right.m2 + left.m9 * right.m6 + left.m10 * right.m10 + left.m11 * right.m14;
+    result.m11 = left.m8 * right.m3 + left.m9 * right.m7 + left.m10 * right.m11 + left.m11 * right.m15;
+    result.m12 = left.m12 * right.m0 + left.m13 * right.m4 + left.m14 * right.m8 + left.m15 * right.m12;
+    result.m13 = left.m12 * right.m1 + left.m13 * right.m5 + left.m14 * right.m9 + left.m15 * right.m13;
+    result.m14 = left.m12 * right.m2 + left.m13 * right.m6 + left.m14 * right.m10 + left.m15 * right.m14;
+    result.m15 = left.m12 * right.m3 + left.m13 * right.m7 + left.m14 * right.m11 + left.m15 * right.m15;
+
+    return result;
+}
+
+static inline Mat4 Matrix4MultiplyValue(Mat4 mat, f32 f)
+{
+    Mat4 result = { 0 };
+
+    result.m0 = mat.m0 * f;
+    result.m1 = mat.m1 * f;
+    result.m2 = mat.m2 * f;
+    result.m3 = mat.m3 * f;
+    result.m4 = mat.m4 * f;
+    result.m5 = mat.m5 * f;
+    result.m6 = mat.m6 * f;
+    result.m7 = mat.m7 * f;
+    result.m8 = mat.m8 * f;
+    result.m9 = mat.m9 * f;
+    result.m10 = mat.m10 * f;
+    result.m11 = mat.m11 * f;
+    result.m12 = mat.m12 * f;
+    result.m13 = mat.m13 * f;
+    result.m14 = mat.m14 * f;
+    result.m15 = mat.m15 * f;
+
+    return result;
+}
+
+static inline Vec4 Matrix4MultiplyVector4(Mat4 mat, Vec4 vec)
+{
+    Vec4 result = { 0 };
+
+    result.x = mat.m0 * vec.x + mat.m1 * vec.y + mat.m2 * vec.z + mat.m3 * vec.w;
+    result.y = mat.m4 * vec.x + mat.m5 * vec.y + mat.m6 * vec.z + mat.m7 * vec.w;
+    result.z = mat.m8 * vec.x + mat.m9 * vec.y + mat.m10 * vec.z + mat.m11 * vec.w;
+    result.w = mat.m12 * vec.x + mat.m13 * vec.y + mat.m14 * vec.z + mat.m15 * vec.w;
+
+    return result;
+}
+
+static inline Vec4 Vector4MultiplyMatrix4(Vec4 vec, Mat4 mat)
+{
+    Vec4 result = { 0 };
+
+    result.x = vec.x * mat.m0 + vec.y * mat.m4 + vec.z * mat.m8 + vec.w * mat.m12;
+    result.y = vec.x * mat.m1 + vec.y * mat.m5 + vec.z * mat.m9 + vec.w * mat.m13;
+    result.z = vec.x * mat.m2 + vec.y * mat.m6 + vec.z * mat.m10 + vec.w * mat.m14;
+    result.w = vec.x * mat.m3 + vec.y * mat.m7 + vec.z * mat.m11 + vec.w * mat.m15;
+
+    return result;
+}
+
+static inline Mat4 Matrix4Inverse(Mat4 mat)
+{
+    Mat4 result = { 0 };
+
+    f32 a0 = mat.m0 * mat.m5 - mat.m4 * mat.m1;
+    f32 a1 = mat.m0 * mat.m6 - mat.m4 * mat.m2;
+    f32 a2 = mat.m0 * mat.m7 - mat.m4 * mat.m3;
+    f32 a3 = mat.m1 * mat.m6 - mat.m5 * mat.m2;
+    f32 a4 = mat.m1 * mat.m7 - mat.m5 * mat.m3;
+    f32 a5 = mat.m2 * mat.m7 - mat.m6 * mat.m3;
+    f32 b5 = mat.m10 * mat.m15 - mat.m14 * mat.m11;
+    f32 b4 = mat.m9 * mat.m15 - mat.m13 * mat.m11;
+    f32 b3 = mat.m9 * mat.m14 - mat.m13 * mat.m10;
+    f32 b2 = mat.m8 * mat.m15 - mat.m12 * mat.m11;
+    f32 b1 = mat.m8 * mat.m14 - mat.m12 * mat.m10;
+    f32 b0 = mat.m8 * mat.m13 - mat.m12 * mat.m9;
+
+    f32 invertDet = 1.0f / (a0 * b5 - a1 * b4 + a2 * b3 + a3 * b2 - a4 * b1 + a5 * b0);
+
+    result.m0 = (mat.m5 * b5 - mat.m6 * b4 + mat.m7 * b3) * invertDet;
+    result.m1 = (-mat.m1 * b5 + mat.m2 * b4 - mat.m3 * b3) * invertDet;
+    result.m2 = (mat.m13 * a5 - mat.m14 * a4 + mat.m15 * a3) * invertDet;
+    result.m3 = (-mat.m9 * a5 + mat.m10 * a4 - mat.m11 * a3) * invertDet;
+
+    result.m4 = (-mat.m4 * b5 + mat.m6 * b2 - mat.m7 * b1) * invertDet;
+    result.m5 = (mat.m0 * b5 - mat.m2 * b2 + mat.m3 * b1) * invertDet;
+    result.m6 = (-mat.m12 * a5 + mat.m14 * a2 - mat.m15 * a1) * invertDet;
+    result.m7 = (mat.m8 * a5 - mat.m10 * a2 + mat.m11 * a1) * invertDet;
+
+    result.m8 = (mat.m4 * b4 - mat.m5 * b2 + mat.m7 * b0) * invertDet;
+    result.m9 = (-mat.m0 * b4 + mat.m1 * b2 - mat.m3 * b0) * invertDet;
+    result.m10 = (mat.m12 * a4 - mat.m13 * a2 + mat.m15 * a0) * invertDet;
+    result.m11 = (-mat.m8 * a4 + mat.m9 * a2 - mat.m11 * a0) * invertDet;
+
+    result.m12 = (-mat.m4 * b3 + mat.m5 * b1 - mat.m6 * b0) * invertDet;
+    result.m13 = (mat.m0 * b3 - mat.m1 * b1 + mat.m2 * b0) * invertDet;
+    result.m14 = (-mat.m12 * a3 + mat.m13 * a1 - mat.m14 * a0) * invertDet;
+    result.m15 = (mat.m8 * a3 - mat.m9 * a1 + mat.m10 * a0) * invertDet;
+
+    return result;
+}
+
+static inline Mat4 MatrixTranslate(Mat4 mat, Vec3 vec)
+{
+    Mat4 translateMatrix = {
+        1.0f, 0.0f, 0.0f, vec.x,
+        0.0f, 1.0f, 0.0f, vec.y,
+        0.0f, 0.0f, 1.0f, vec.z,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    Mat4 result = Matrix4Multiply(mat, translateMatrix);
+    return result;
+}
+
+static inline Mat4 MatrixScale(Mat4 mat, Vec3 scale)
+{
+    Mat4 scaleMatrix = {
+        scale.x, 0.0f, 0.0f, 0.0f,
+        0.0f, scale.y, 0.0f, 0.0f,
+        0.0f, 0.0f, scale.z, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    Mat4 result = Matrix4Multiply(mat, scaleMatrix);
+    return result;
+}
+
+static inline Mat4 MatrixRotate(Mat4 mat, f32 angle, Vec3 axis)
+{
+    // https://learnopengl.com/Getting-started/Transformations
+
+    Mat4 rotationMatrix = { 0 };
+
+    // Cache for optimization
+    f32 cosAngle = cosf(angle);
+    f32 sinAngle = sinf(angle);
+    f32 oneMinusCosAngle = (1.0f - cosAngle);
+    f32 xy = axis.x * axis.y;
+    f32 xz = axis.x * axis.z;
+    f32 yz = axis.y * axis.z;
+
+    rotationMatrix.m0 = cosAngle + (axis.x * axis.x) * oneMinusCosAngle;
+    rotationMatrix.m1 = xy * oneMinusCosAngle - axis.z * sinAngle;
+    rotationMatrix.m2 = xz * oneMinusCosAngle + axis.y * sinAngle;
+    rotationMatrix.m4 = xy * oneMinusCosAngle + axis.z * sinAngle;
+    rotationMatrix.m5 = cosAngle + (axis.y * axis.y) * oneMinusCosAngle;
+    rotationMatrix.m6 = yz * oneMinusCosAngle - axis.x * sinAngle;
+    rotationMatrix.m8 = xz * oneMinusCosAngle - axis.y * sinAngle;
+    rotationMatrix.m9 = yz * oneMinusCosAngle + axis.x * sinAngle;
+    rotationMatrix.m10 = cosAngle + (axis.z * axis.z) * oneMinusCosAngle;
+    rotationMatrix.m15 = 1.0f;
+
+    Mat4 result = Matrix4Multiply(mat, rotationMatrix);
+    return result;
+}
+
+static inline Mat4 MatrixOrthogonal(f32 left, f32 right, f32 bottom, f32 top, f32 near, f32 far)
+{
+    // https://en.wikipedia.org/wiki/Orthographic_projection
+
+    Mat4 result = { 0 };
+
+    result.m0 = 2.0f / (right - left);
+    result.m3 = -((right + left) / (right - left));
+    result.m5 = 2.0f / (top - bottom);
+    result.m7 = -((top + bottom) / (top - bottom));
+    result.m10 = -2.0f / (far - near);
+    result.m11 = -((far + near) / (far - near));
+    result.m15 = 1.0f;
+
+    return result;
+}
+
+inline Mat4 operator+(const Mat4& left, const Mat4& right)
+{
+    Mat4 result = Matrix4Add(left, right);
+    return result;
+}
+
+inline Mat4& operator+=(Mat4& left, const Mat4& right)
+{
+    left = Matrix4Add(left, right);
+    return left;
+}
+
+inline Mat4 operator-(const Mat4& left, const Mat4& right)
+{
+    Mat4 result = Matrix4Subtract(left, right);
+    return result;
+}
+
+inline Mat4& operator-=(Mat4& left, const Mat4& right)
+{
+    left = Matrix4Subtract(left, right);
+    return left;
+}
+
+inline Mat4 operator*(const Mat4& left, const Mat4& right)
+{
+    Mat4 result = Matrix4Multiply(left, right);
+    return result;
+}
+
+inline Mat4& operator*=(Mat4& left, const Mat4& right)
+{
+    left = Matrix4Multiply(left, right);
+    return left;
+}
+
+inline Mat4 operator*(const Mat4& left, const f32& right)
+{
+    Mat4 result = Matrix4MultiplyValue(left, right);
+    return result;
+}
+
+inline Mat4 operator*(const f32& right, const Mat4& left)
+{
+    Mat4 result = Matrix4MultiplyValue(left, right);
+    return result;
+}
+
+inline Mat4& operator*=(Mat4& left, const f32& right)
+{
+    left = Matrix4MultiplyValue(left, right);
+    return left;
+}
+
+inline Vec4 operator*(const Mat4& left, const Vec4& right)
+{
+    Vec4 result = Matrix4MultiplyVector4(left, right);
+    return result;
+}
+
+inline Vec4 operator*(const Vec4& left, const Mat4& right)
+{
+    Vec4 result = Vector4MultiplyMatrix4(left, right);
+    return result;
+}
+
+inline Vec4& operator*=(Vec4& left, const Mat4& right)
+{
+    left = Vector4MultiplyMatrix4(left, right);
+    return left;
 }

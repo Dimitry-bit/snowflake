@@ -23,7 +23,7 @@ int main()
     DisableVsync();
     SASSERT(IsVsyncEnabled() == false);
 
-//    SetWindowSize(1280, 720);
+    SetWindowSize(800, 600);
 //    LOG_INFO("Screen Size: %dx%d", (i32) GetWindowSize().x, (i32) GetWindowSize().y);
 //    SASSERT(GetWindowWidth() == 1280);
 //    SASSERT(GetWindowHeight() == 720);
@@ -43,7 +43,7 @@ int main()
     f32 vertices[] = {
         // Position  // Color
         0.0f,  0.5f, 1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+       -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
         0.5f, -0.5f, 0.0f, 0.0f, 1.0f
     };
     // @formatter:on
@@ -65,6 +65,17 @@ int main()
     }
 
     IndexBuffer ib = IndexBufferInit(indices, 3);
+
+    Mat4 proj = MatrixOrthogonal(0.0f, 800.0f, 600.0f, 0.0f, 0.0f, 1.0f);
+    // NOTE: Flip Y-axis
+    proj = MatrixScale(proj, Vec3{ 1.0f, -1.0f, 1.0f });
+
+    Mat4 view = Matrix4Identity();
+    view = MatrixTranslate(view, Vec3{ 0.0f, 0.0f, 0.0f });
+
+    Mat4 model = Matrix4Identity();
+    model = MatrixTranslate(model, Vec3{ 400.0f, -300.0f, 0.0f });
+    model = MatrixScale(model, Vec3{ 300, 300, 1 });
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -98,6 +109,10 @@ int main()
                 LOG_DEBUG("MouseWheel move %f", GetMouseWheel().y);
             }
         }
+
+        model = MatrixRotate(model, GetFrameTime(), Vec3{ 0.0f, 0.0f, 1.0f });
+        Mat4 mvp = proj * view * model;
+        ShaderSetMatrix4(&shader, "uMvp", mvp);
 
         DrawLowLevel(&va, &ib, &shader);
 

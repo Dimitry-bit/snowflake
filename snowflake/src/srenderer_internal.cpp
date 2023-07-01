@@ -460,6 +460,33 @@ void ShaderSetUniform1i(Shader* shader, const char* uniformName, i32 v)
     }
 }
 
+void ShaderSetMatrix2(Shader* shader, const char* uniformName, Mat2 mat)
+{
+    ShaderBind(shader);
+    i32 location = ShaderGetUniformLocation(shader, uniformName);
+    if (location != -1) {
+        GLCall(glUniformMatrix4fv(location, 1, GL_TRUE, (f32*) mat.f));
+    }
+}
+
+void ShaderSetMatrix3(Shader* shader, const char* uniformName, Mat3 mat)
+{
+    ShaderBind(shader);
+    i32 location = ShaderGetUniformLocation(shader, uniformName);
+    if (location != -1) {
+        GLCall(glUniformMatrix4fv(location, 1, GL_TRUE, (f32*) mat.f));
+    }
+}
+
+void ShaderSetMatrix4(Shader* shader, const char* uniformName, Mat4 mat)
+{
+    ShaderBind(shader);
+    i32 location = ShaderGetUniformLocation(shader, uniformName);
+    if (location != -1) {
+        GLCall(glUniformMatrix4fv(location, 1, GL_TRUE, (f32*) mat.f));
+    }
+}
+
 void DrawLowLevel(const VertexArray* va, const IndexBuffer* ib, const Shader* shader)
 {
     VertexArrayBind(va);

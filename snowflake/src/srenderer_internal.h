@@ -79,6 +79,7 @@ SAPI void ShaderSetUniform3f(Shader* shader, const char* uniformName, Vec3 v);
 SAPI void ShaderSetUniform4f(Shader* shader, const char* uniformName, f32 v0, f32 v1, f32 v2, f32 v3);
 SAPI void ShaderSetUniform4f(Shader* shader, const char* uniformName, Vec4 v);
 SAPI void ShaderSetUniform1i(Shader* shader, const char* uniformName, i32 v);
+SAPI void ShaderSetMatrix4(Shader* shader, const char* uniformName, Mat4 mat);
 
 SAPI void DrawLowLevel(const VertexArray* va, const IndexBuffer* ib, const Shader* shader);
 SAPI void DrawLowLevel(const VertexArray* va, const Shader* shader, u32 count);
