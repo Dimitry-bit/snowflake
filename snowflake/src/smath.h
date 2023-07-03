@@ -2,6 +2,9 @@
 
 #include <cmath>
 
+#define S_PI 3.14159265358979323846
+#define S_PI32 3.14159265359f
+
 union SAPI Vec2 {
     f32 f[2];
 
@@ -104,6 +107,121 @@ union SAPI Mat4 {
         return f[index];
     }
 };
+
+// NOTE: cmath wrapper functions to keep the API consistent
+// NOTE: Should implement with SSE intrinsics
+
+static inline f32 Sin(f32 angle)
+{
+    return sinf(angle);
+}
+
+static inline f32 Cos(f32 angle)
+{
+    return cosf(angle);
+}
+
+static inline f32 Tan(f32 angle)
+{
+    return tanf(angle);
+}
+
+static inline f32 ASin(f32 x)
+{
+    return asinf(x);
+}
+
+static inline f32 ACos(f32 x)
+{
+    return acosf(x);
+}
+
+static inline f32 ATan(f32 x)
+{
+    return atanf(x);
+}
+
+static inline f32 ATan2(f32 y, f32 x)
+{
+    return atan2f(y, x);
+}
+
+static inline f32 Ceil(f32 x)
+{
+    return ceilf(x);
+}
+
+static inline f32 Floor(f32 x)
+{
+    return floorf(x);
+}
+
+static inline f32 Trunc(f32 x)
+{
+    return truncf(x);
+}
+
+static inline f32 Round(f32 x)
+{
+    return truncf(x);
+}
+
+static inline f32 Sqrt(f32 x)
+{
+    return sqrtf(x);
+}
+
+static inline i32 Clamp(i32 x, i32 min, i32 max)
+{
+    const i32 t = x < min ? min : x;
+    return t > max ? max : t;
+}
+
+static inline f32 Clamp(f32 x, f32 min, f32 max)
+{
+    const f32 t = x < min ? min : x;
+    return t > max ? max : t;
+}
+
+static inline i32 Max(i32 a, i32 b)
+{
+    return ((a > b) ? a : b);
+}
+
+static inline f32 Max(f32 a, f32 b)
+{
+    return ((a > b) ? a : b);
+}
+
+static inline i32 Min(i32 a, i32 b)
+{
+    return ((a < b) ? a : b);
+}
+
+static inline f32 Min(f32 a, f32 b)
+{
+    return ((a < b) ? a : b);
+}
+
+static inline i32 Abs(i32 a)
+{
+    return ((a > 0) ? a : -a);
+}
+
+static inline f32 Abs(f32 a)
+{
+    return ((a > 0) ? a : -a);
+}
+
+static inline i32 Square(i32 x)
+{
+    return x * x;
+}
+
+static inline f32 Square(f32 x)
+{
+    return x * x;
+}
 
 static inline Vec2 Vector2Zero()
 {

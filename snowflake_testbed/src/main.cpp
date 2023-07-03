@@ -39,6 +39,19 @@ int main()
     DisableCursor();
     EnableCursor();
 
+    SASSERT(Min(5, 10) == 5);
+    SASSERT(Min(5.0f, 10.0f) == 5.0f);
+    SASSERT(Max(5, 10) == 10);
+    SASSERT(Max(5.0f, 10.0f) == 10.0f);
+    SASSERT(Clamp(2, 0, 1) == 1);
+    SASSERT(Clamp(2.0f, 0.0f, 1.0f) == 1.0f);
+    SASSERT(Clamp(-2, 0, 1) == 0);
+    SASSERT(Clamp(-2.0f, 0.0f, 0.0f) == 0.0f);
+    SASSERT(Abs(-2) == 2);
+    SASSERT(Abs(-2.0f) == 2.0f);
+    SASSERT(Square(-2) == 4);
+    SASSERT(Square(-2.0f) == 4.0f);
+
     // @formatter:off
     f32 vertices[] = {
         // Position  // Color
