@@ -8,6 +8,17 @@ union SAPI Color {
     struct {
         u8 r, g, b, a;
     };
+
+    explicit operator Vec4()
+    {
+        Vec4 result = { 0 };
+        result.r = r;
+        result.g = g;
+        result.b = b;
+        result.a = a;
+
+        return result;
+    }
 };
 
 #define SNOWWHITE (Color) {243, 246, 251, 255}
@@ -27,3 +38,16 @@ union SAPI Color {
 
 #define WHITE (Color) {255, 255, 255, 255}
 #define BLACK (Color) {0, 0, 0, 255}
+#define MAGENTA (Color) {255, 0, 255, 255}
+
+static inline Vec4 ColorNormalize(Color color)
+{
+    Vec4 result = { 0 };
+
+    result.r = (f32) color.r / 255.0f;
+    result.g = (f32) color.g / 255.0f;
+    result.b = (f32) color.b / 255.0f;
+    result.a = (f32) color.a / 255.0f;
+
+    return result;
+}
