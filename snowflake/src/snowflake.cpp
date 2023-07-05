@@ -65,6 +65,9 @@ bool8 InitWindow(const char* title, i32 width, i32 height, i32 cFlags)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     }
 
+    // TODO(Tony): Should be extracted a setting
+    glfwWindowHint(GLFW_SAMPLES, 4);
+
     windowHandle = glfwCreateWindow(width, height, title, nullptr, nullptr);
 
     if (!windowHandle) {
