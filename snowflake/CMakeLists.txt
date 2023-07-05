@@ -12,10 +12,11 @@ target_link_libraries(snowflake PUBLIC ${OPENGL_LIBRARY} glfw glew32s)
 target_include_directories(snowflake PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 target_compile_options(snowflake PRIVATE
-        -Wall -Wextra -Wpedantic -Wuninitialized -Werror=pointer-arith
+        -Wall -Wextra -Wuninitialized -Werror=pointer-arith
         -Wno-gnu-zero-variadic-macro-arguments
         -Wdouble-promotion -Wfloat-equal
-        -Wundef -Wshadow -Wno-unused-variable -Wunused-label -Wno-array-bounds -Wno-infinite-recursion)
+        -Wundef -Wshadow -Wno-unused-variable -Wunused-label -Wno-array-bounds -Wno-infinite-recursion
+        -Wno-unused-parameter -Wno-missing-braces)
 
 
 target_compile_options(snowflake PUBLIC

@@ -237,41 +237,25 @@ static inline Vec2 Vector2One()
 
 static inline Vec2 Vector2Add(const Vec2& v1, const Vec2& v2)
 {
-    Vec2 result = {
-        .x = v1.x + v2.x,
-        .y = v1.y + v2.y
-    };
-
+    Vec2 result = { v1.x + v2.x, v1.y + v2.y };
     return result;
 }
 
 static inline Vec2 Vector2AddValue(const Vec2& v, const f32& f)
 {
-    Vec2 result = {
-        .x = v.x + f,
-        .y = v.y + f
-    };
-
+    Vec2 result = { v.x + f, v.y + f };
     return result;
 }
 
 static inline Vec2 Vector2Subtract(const Vec2& v1, const Vec2& v2)
 {
-    Vec2 result = {
-        .x = v1.x - v2.x,
-        .y = v1.y - v2.y
-    };
-
+    Vec2 result = { v1.x - v2.x, v1.y - v2.y };
     return result;
 }
 
 static inline Vec2 Vector2SubtractValue(const Vec2& v, const f32& f)
 {
-    Vec2 result = {
-        .x = v.x - f,
-        .y = v.y - f
-    };
-
+    Vec2 result = { v.x - f, v.y - f };
     return result;
 }
 
@@ -283,21 +267,13 @@ static inline f32 Vector2DotProduct(const Vec2& v1, const Vec2& v2)
 
 static inline Vec2 Vector2MultiplyValue(const Vec2& v, const f32& f)
 {
-    Vec2 result = {
-        .x = v.x * f,
-        .y = v.y * f
-    };
-
+    Vec2 result = { v.x * f, v.y * f };
     return result;
 }
 
 static inline Vec2 Vector2DivideValue(const Vec2& v, const f32& f)
 {
-    Vec2 result = {
-        .x = v.x / f,
-        .y = v.y / f
-    };
-
+    Vec2 result = { v.x / f, v.y / f };
     return result;
 }
 
@@ -333,11 +309,7 @@ static inline f32 Vector2Angle(const Vec2& v)
 
 static inline Vec2 Vector2Negate(const Vec2& v)
 {
-    Vec2 result = {
-        .x = -v.x,
-        .y = -v.y
-    };
-
+    Vec2 result = { -v.x, -v.y };
     return result;
 }
 
@@ -357,11 +329,7 @@ static inline Vec2 Vector2Normalize(const Vec2& v)
 
 static inline Vec2 Vector2Invert(const Vec2& v)
 {
-    Vec2 result = {
-        .x = 1.0f / v.x,
-        .y = 1.0f / v.y
-    };
-
+    Vec2 result = { 1.0f / v.x, 1.0f / v.y };
     return result;
 }
 
@@ -455,12 +423,22 @@ static inline Vec3 Vector3One()
     return result;
 }
 
+static inline Vec3 Vector3(Vec2 xy, f32 z)
+{
+    Vec3 result = { 0 };
+    result.x = xy.x;
+    result.y = xy.y;
+    result.z = z;
+
+    return result;
+}
+
 static inline Vec3 Vector3Add(const Vec3& v1, const Vec3& v2)
 {
     Vec3 result = {
-        .x = v1.x + v2.x,
-        .y = v1.y + v2.y,
-        .z = v1.z + v2.z
+        v1.x + v2.x,
+        v1.y + v2.y,
+        v1.z + v2.z
     };
 
     return result;
@@ -469,9 +447,9 @@ static inline Vec3 Vector3Add(const Vec3& v1, const Vec3& v2)
 static inline Vec3 Vector3AddValue(const Vec3& v, const f32& f)
 {
     Vec3 result = {
-        .x = v.x + f,
-        .y = v.y + f,
-        .z = v.z + f
+        v.x + f,
+        v.y + f,
+        v.z + f
     };
 
     return result;
@@ -480,9 +458,9 @@ static inline Vec3 Vector3AddValue(const Vec3& v, const f32& f)
 static inline Vec3 Vector3Subtract(const Vec3& v1, const Vec3& v2)
 {
     Vec3 result = {
-        .x = v1.x - v2.x,
-        .y = v1.y - v2.y,
-        .z = v1.z - v2.z
+        v1.x - v2.x,
+        v1.y - v2.y,
+        v1.z - v2.z
     };
 
     return result;
@@ -491,9 +469,9 @@ static inline Vec3 Vector3Subtract(const Vec3& v1, const Vec3& v2)
 static inline Vec3 Vector3SubtractValue(const Vec3& v, const f32& f)
 {
     Vec3 result = {
-        .x = v.x - f,
-        .y = v.y - f,
-        .z = v.z - f
+        v.x - f,
+        v.y - f,
+        v.z - f
     };
 
     return result;
@@ -508,9 +486,9 @@ static inline f32 Vector3DotProduct(const Vec3& v1, const Vec3& v2)
 static inline Vec3 Vector3MultiplyValue(const Vec3& v, const f32& f)
 {
     Vec3 result = {
-        .x = v.x * f,
-        .y = v.y * f,
-        .z = v.z * f
+        v.x * f,
+        v.y * f,
+        v.z * f
     };
 
     return result;
@@ -519,9 +497,9 @@ static inline Vec3 Vector3MultiplyValue(const Vec3& v, const f32& f)
 static inline Vec3 Vector3DivideValue(const Vec3& v, const f32& f)
 {
     Vec3 result = {
-        .x = v.x / f,
-        .y = v.y / f,
-        .z = v.z / f
+        v.x / f,
+        v.y / f,
+        v.z / f
     };
 
     return result;
@@ -554,9 +532,9 @@ static inline f32 Vector3LengthSqr(const Vec3& v)
 static inline Vec3 Vector3Negate(const Vec3& v)
 {
     Vec3 result = {
-        .x = -v.x,
-        .y = -v.y,
-        .z = -v.z
+        -v.x,
+        -v.y,
+        -v.z
     };
 
     return result;
@@ -580,9 +558,9 @@ static inline Vec3 Vector3Normalize(const Vec3& v)
 static inline Vec3 Vector3Invert(const Vec3& v)
 {
     Vec3 result = {
-        .x = 1.0f / v.x,
-        .y = 1.0f / v.y,
-        .z = 1.0f / v.z
+        1.0f / v.x,
+        1.0f / v.y,
+        1.0f / v.z
     };
 
     return result;
@@ -678,13 +656,24 @@ static inline Vec4 Vector4One()
     return result;
 }
 
+static inline Vec4 Vector4(Vec3 xyz, f32 w)
+{
+    Vec4 result = { 0 };
+    result.x = xyz.x;
+    result.y = xyz.y;
+    result.z = xyz.z;
+    result.w = w;
+
+    return result;
+}
+
 static inline Vec4 Vector4Add(const Vec4& v1, const Vec4& v2)
 {
     Vec4 result = {
-        .x = v1.x + v2.x,
-        .y = v1.y + v2.y,
-        .z = v1.z + v2.z,
-        .w = v1.w + v2.w
+        v1.x + v2.x,
+        v1.y + v2.y,
+        v1.z + v2.z,
+        v1.w + v2.w
     };
 
     return result;
@@ -693,10 +682,10 @@ static inline Vec4 Vector4Add(const Vec4& v1, const Vec4& v2)
 static inline Vec4 Vector4AddValue(const Vec4& v, const f32& f)
 {
     Vec4 result = {
-        .x = v.x + f,
-        .y = v.y + f,
-        .z = v.z + f,
-        .w = v.w + f
+        v.x + f,
+        v.y + f,
+        v.z + f,
+        v.w + f
     };
 
     return result;
@@ -705,10 +694,10 @@ static inline Vec4 Vector4AddValue(const Vec4& v, const f32& f)
 static inline Vec4 Vector4Subtract(const Vec4& v1, const Vec4& v2)
 {
     Vec4 result = {
-        .x = v1.x - v2.x,
-        .y = v1.y - v2.y,
-        .z = v1.z - v2.z,
-        .w = v1.w - v2.w
+        v1.x - v2.x,
+        v1.y - v2.y,
+        v1.z - v2.z,
+        v1.w - v2.w
     };
 
     return result;
@@ -717,10 +706,10 @@ static inline Vec4 Vector4Subtract(const Vec4& v1, const Vec4& v2)
 static inline Vec4 Vector4SubtractValue(const Vec4& v, const f32& f)
 {
     Vec4 result = {
-        .x = v.x - f,
-        .y = v.y - f,
-        .z = v.z - f,
-        .w = v.w - f
+        v.x - f,
+        v.y - f,
+        v.z - f,
+        v.w - f
     };
 
     return result;
@@ -735,10 +724,10 @@ static inline f32 Vector4DotProduct(const Vec4& v1, const Vec4& v2)
 static inline Vec4 Vector4MultiplyValue(const Vec4& v, const f32& f)
 {
     Vec4 result = {
-        .x = v.x * f,
-        .y = v.y * f,
-        .z = v.z * f,
-        .w = v.w * f
+        v.x * f,
+        v.y * f,
+        v.z * f,
+        v.w * f
     };
 
     return result;
@@ -747,10 +736,10 @@ static inline Vec4 Vector4MultiplyValue(const Vec4& v, const f32& f)
 static inline Vec4 Vector4DivideValue(const Vec4& v, const f32& f)
 {
     Vec4 result = {
-        .x = v.x / f,
-        .y = v.y / f,
-        .z = v.z / f,
-        .w = v.w / f
+        v.x / f,
+        v.y / f,
+        v.z / f,
+        v.w / f
     };
 
     return result;
@@ -784,11 +773,7 @@ static inline f32 Vector4LengthSqr(const Vec4& v)
 
 static inline Vec4 Vector4Negate(const Vec4& v)
 {
-    Vec4 result = {
-        .x = -v.x,
-        .y = -v.y,
-        .z = -v.z
-    };
+    Vec4 result = { -v.x, -v.y, -v.z, -v.w, };
 
     return result;
 }
@@ -812,10 +797,10 @@ static inline Vec4 Vector4Normalize(const Vec4& v)
 static inline Vec4 Vector4Invert(const Vec4& v)
 {
     Vec4 result = {
-        .x = 1.0f / v.x,
-        .y = 1.0f / v.y,
-        .z = 1.0f / v.z,
-        .w = 1.0f / v.w
+        1.0f / v.x,
+        1.0f / v.y,
+        1.0f / v.z,
+        1.0f / v.w
     };
 
     return result;
@@ -911,9 +896,7 @@ static inline Mat2 Matrix2Identity()
 
 static inline f32 Matrix2Determinant(Mat2 mat)
 {
-    f32 result = 0.0f;
-
-    result = mat.m0 * mat.m3 - mat.m1 * mat.m2;
+    f32 result = mat.m0 * mat.m3 - mat.m1 * mat.m2;
     return result;
 }
 
