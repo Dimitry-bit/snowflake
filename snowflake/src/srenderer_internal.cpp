@@ -11,6 +11,9 @@ static u32 ShaderCreate(char* vertexShader, char* fragmentShader);
 static u32 ShaderCompile(u32 type, char* source);
 static i32 ShaderGetUniformLocation(Shader* shader, const char* uniformName);
 
+RendererContext rContext = { };
+static bool isInit;
+
 void GLClearError()
 {
     while (glGetError() != GL_NO_ERROR);
@@ -77,6 +80,56 @@ static u32 GLGetSizeofType(u32 type)
     return 0;
 }
 
+void RendererStartup(f32 width, f32 height)
+{
+    SASSERT_MSG(isInit == false, "Renderer is already started");
+
+    // NOTE(Tony): Replace with ShaderLoadFromMemory
+    rContext.boundShader = ShaderLoadFromFiles("../resources/shaders/basic_vertex.glsl",
+                                               "../resources/shaders/basic_fragment.glsl");
+    ShaderBind(&rContext.boundShader);
+
+    RendererCreateViewport(width, height);
+
+    // Initialize default white texture
+    TextureDefault();
+
+    rContext.layout = VertexBufferLayoutInit();
+    VertexBufferLayoutPushVec2(&rContext.layout, 1);
+    VertexBufferLayoutPushVec2(&rContext.layout, 1);
+
+    isInit = true;
+
+    LOG_INFO("Renderer Startup");
+}
+
+void RendererShutdown()
+{
+    SASSERT_MSG(isInit == true, "Renderer is already shutdown");
+
+    ShaderDelete(&rContext.boundShader);
+    VertexBufferLayoutDelete(&rContext.layout);
+
+    // NOTE(Tony): Delete default shader
+    // NOTE(Tony): Delete default texture
+
+    memset(&rContext, 0, sizeof(RendererContext));
+
+    LOG_INFO("Renderer Shutdown");
+}
+
+void RendererCreateViewport(f32 width, f32 height)
+{
+    rContext.projMatrix = MatrixOrthogonal(0.0f, width, height, 0.0f, 0.0f, 1.0f);
+    rContext.viewMatrix = Matrix4Identity();
+    GLCall(glViewport(0, 0, width, height));
+}
+
+void RendererSetPolygonMode(u32 face, u32 mode)
+{
+    GLCall(glPolygonMode(face, mode));
+}
+
 VertexBuffer VertexBufferInit(const void* data, u32 size)
 {
     VertexBuffer result = { };
@@ -84,7 +137,15 @@ VertexBuffer VertexBufferInit(const void* data, u32 size)
     GLCall(glBindBuffer(GL_ARRAY_BUFFER, result.rendererID));
     GLCall(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
 
-    LOG_TRACE("VertexBuffer(ID:%d): Created successfully", result.rendererID);
+    return result;
+}
+
+SAPI VertexBuffer VertexBufferInit(const Vertex* data, u32 count)
+{
+    VertexBuffer result = { };
+    GLCall(glGenBuffers(1, &result.rendererID));
+    GLCall(glBindBuffer(GL_ARRAY_BUFFER, result.rendererID));
+    GLCall(glBufferData(GL_ARRAY_BUFFER, count * sizeof(Vertex), data, GL_STATIC_DRAW));
 
     return result;
 }
@@ -95,7 +156,6 @@ void VertexBufferDelete(VertexBuffer* vb)
 
     GLCall(glDeleteBuffers(1, &vb->rendererID));
 
-    LOG_TRACE("VertexBuffer(ID:%d): deleted successfully", vb->rendererID);
     memset(vb, 0, sizeof(VertexBuffer));
 }
 
@@ -119,8 +179,6 @@ IndexBuffer IndexBufferInit(const void* data, u32 count)
     GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, result.rendererID));
     GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(u32), data, GL_STATIC_DRAW));
 
-    LOG_TRACE("IndexBuffer(ID:%d): Created successfully", result.rendererID);
-
     return result;
 }
 
@@ -130,7 +188,6 @@ void IndexBufferDelete(IndexBuffer* ib)
 
     GLCall(glDeleteBuffers(1, &ib->rendererID));
 
-    LOG_TRACE("IndexBuffer(ID:%d): Deleted successfully", ib->rendererID);
     memset(ib, 0, sizeof(IndexBuffer));
 }
 
@@ -150,8 +207,6 @@ VertexArray VertexArrayInit()
     VertexArray result = { };
     GLCall(glGenVertexArrays(1, &result.rendererID));
 
-    LOG_TRACE("VertexArray(ID:%d): Created successfully", result.rendererID);
-
     return result;
 }
 
@@ -160,7 +215,6 @@ void VertexArrayDelete(VertexArray* va)
     SASSERT_MSG(va, "VertexArray can't be null");
     GLCall(glDeleteVertexArrays(1, &va->rendererID));
 
-    LOG_TRACE("VertexArray(ID:%d): Deleted successfully", va->rendererID);
     memset(va, 0, sizeof(VertexArray));
 }
 
@@ -272,12 +326,31 @@ void VertexBufferLayoutPushUByte(VertexBufferLayout* layout, u32 count)
     layout->stride += count * GLGetSizeofType(GL_UNSIGNED_BYTE);
 }
 
+void VertexBufferLayoutPushVec2(VertexBufferLayout* layout, u32 count)
+{
+    SASSERT(layout);
+
+    VertexBufferElement* element = (VertexBufferElement*) calloc(1, sizeof(VertexBufferElement));
+    element->type = GL_FLOAT;
+    element->count = 2 * count;
+    element->normalized = GL_FALSE;
+
+    if (layout->elementsEnd) {
+        layout->elementsEnd->next = element;
+    } else {
+        layout->elementsBegin = element;
+    }
+
+    layout->elementsEnd = element;
+    layout->stride += 2 * count * GLGetSizeofType(GL_FLOAT);
+}
+
 Shader ShaderLoadFromFiles(const char* vsFilePath, const char* fsFilePath)
 {
     Shader result = { };
 
-    char* vertexShader = LoadFile(vsFilePath);
-    char* fragmentShader = LoadFile(fsFilePath);
+    char* vertexShader = FileLoad(vsFilePath);
+    char* fragmentShader = FileLoad(fsFilePath);
 
     u64 vsFilePathLen = strlen(vsFilePath);
     result.vsFilePath = (char*) malloc(vsFilePathLen + 1);
@@ -289,8 +362,8 @@ Shader ShaderLoadFromFiles(const char* vsFilePath, const char* fsFilePath)
 
     result.rendererID = ShaderCreate(vertexShader, fragmentShader);
 
-    UnloadFile(vertexShader);
-    UnloadFile(fragmentShader);
+    FileUnload(vertexShader);
+    FileUnload(fragmentShader);
 
     LOG_DEBUG("Shader(ID:%d): Loaded successfully", result.rendererID);
 
@@ -411,7 +484,7 @@ void ShaderSetUniform2f(Shader* shader, const char* uniformName, Vec2 v)
     ShaderBind(shader);
     i32 location = ShaderGetUniformLocation(shader, uniformName);
     if (location != -1) {
-        GLCall(glUniform2fv(location, 2, v.f));
+        GLCall(glUniform2fv(location, 1, v.f));
     }
 }
 
@@ -429,7 +502,7 @@ void ShaderSetUniform3f(Shader* shader, const char* uniformName, Vec3 v)
     ShaderBind(shader);
     i32 location = ShaderGetUniformLocation(shader, uniformName);
     if (location != -1) {
-        GLCall(glUniform3fv(location, 3, v.f));
+        GLCall(glUniform3fv(location, 1, v.f));
     }
 }
 
@@ -447,7 +520,7 @@ void ShaderSetUniform4f(Shader* shader, const char* uniformName, Vec4 v)
     ShaderBind(shader);
     i32 location = ShaderGetUniformLocation(shader, uniformName);
     if (location != -1) {
-        GLCall(glUniform4fv(location, 4, v.f));
+        GLCall(glUniform4fv(location, 1, (const f32*) v.f));
     }
 }
 
@@ -487,19 +560,122 @@ void ShaderSetMatrix4(Shader* shader, const char* uniformName, Mat4 mat)
     }
 }
 
-void DrawLowLevel(const VertexArray* va, const IndexBuffer* ib, const Shader* shader)
+Texture2D TextureLoadFromMemory(unsigned char* data, i32 width, i32 height)
 {
-    VertexArrayBind(va);
-    IndexBufferBind(ib);
-    ShaderBind(shader);
+    Texture2D texture = { };
+    texture.width = width;
+    texture.height = height;
 
-    GLCall(glDrawElements(GL_TRIANGLES, ib->count, GL_UNSIGNED_INT, nullptr));
+    GLCall(glGenTextures(1, &texture.rendererID));
+    GLCall(glBindTexture(GL_TEXTURE_2D, texture.rendererID));
+
+    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT));
+    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT));
+
+    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
+    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+
+    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texture.width, texture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data));
+    GLCall(glGenerateMipmap(GL_TEXTURE_2D));
+
+    GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+
+    return texture;
 }
 
-void DrawLowLevel(const VertexArray* va, const Shader* shader, u32 count)
+const Texture2D* TextureDefault()
 {
-    VertexArrayBind(va);
-    ShaderBind(shader);
+    static Texture2D defaultTex = { };
 
-    GLCall(glDrawArrays(GL_TRIANGLES, 0, count));
+    if (defaultTex.rendererID == 0) {
+        unsigned char texData[] = { 255, 255, 255, 255 };
+        defaultTex = TextureLoadFromMemory(texData, 1, 1);
+    }
+
+    return &defaultTex;
+}
+
+void TextureDelete(Texture2D* texture)
+{
+    SASSERT(texture);
+
+    GLCall(glDeleteTextures(1, &texture->rendererID));
+    memset(texture, 0, sizeof(Texture2D));
+}
+
+void TextureBind(const Texture2D* texture, i32 slot)
+{
+    SASSERT(texture);
+
+    GLCall(glActiveTexture(GL_TEXTURE0 + slot));
+    GLCall(glBindTexture(GL_TEXTURE_2D, texture->rendererID));
+}
+
+void TextureUnbind()
+{
+    GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+}
+
+void RendererDraw(DrawMode mode, const VertexArray* va, const IndexBuffer* ib, const Texture2D* texture,
+                  Mat4 modelMatrix)
+{
+    SASSERT_MSG(isInit, "Renderer is not started")
+
+    VertexArrayBind(va);
+    IndexBufferBind(ib);
+
+    Mat4 mvp = rContext.projMatrix * rContext.viewMatrix * modelMatrix;
+    ShaderSetMatrix4(&rContext.boundShader, "uMvp", mvp);
+
+    if (texture) {
+        TextureBind(texture, 0);
+    } else {
+        TextureBind(TextureDefault(), 0);
+    }
+
+    GLCall(glDrawElements(mode, ib->count, GL_UNSIGNED_INT, nullptr));
+}
+
+void RendererDraw(DrawMode mode, const VertexArray* va, u32 count, const Texture2D* texture, Mat4 transformMatrix)
+{
+    SASSERT_MSG(isInit, "Renderer is not started")
+
+    VertexArrayBind(va);
+
+    Mat4 mvp = rContext.projMatrix * rContext.viewMatrix * transformMatrix;
+    ShaderSetMatrix4(&rContext.boundShader, "uMvp", mvp);
+
+    if (texture) {
+        TextureBind(texture, 0);
+    } else {
+        TextureBind(TextureDefault(), 0);
+    }
+
+    GLCall(glDrawArrays(mode, 0, count));
+}
+
+void RendererDraw(DrawMode mode, const Vertex* vertices, u32 count, const Texture2D* texture, Mat4 transformMatrix)
+{
+    SASSERT_MSG(isInit, "Renderer is not started")
+
+    VertexArray va = VertexArrayInit();
+    VertexArrayBind(&va);
+    VertexBuffer vb = VertexBufferInit(vertices, count);
+    VertexBufferBind(&vb);
+
+    VertexArrayAddBuffer(&va, &vb, &rContext.layout);
+
+    Mat4 mvp = rContext.projMatrix * rContext.viewMatrix * transformMatrix;
+    ShaderSetMatrix4(&rContext.boundShader, "uMvp", mvp);
+
+    if (texture) {
+        TextureBind(texture, 0);
+    } else {
+        TextureBind(TextureDefault(), 0);
+    }
+
+    GLCall(glDrawArrays(mode, 0, count));
+
+    VertexBufferDelete(&vb);
+    VertexArrayDelete(&va);
 }

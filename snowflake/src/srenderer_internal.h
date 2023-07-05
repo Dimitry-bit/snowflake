@@ -1,6 +1,7 @@
 #pragma once
 
 #include "snowflake.h"
+#include "GL/glew.h"
 
 #ifndef GLCall
 #define GLCall(x)                                                  \
@@ -8,6 +9,21 @@
         x;                                                         \
         SASSERT(GLLogCall(#x))
 #endif
+
+enum SAPI DrawMode {
+    POINTS = GL_POINTS,
+    LINE_STRIP = GL_LINE_STRIP,
+    LINE_LOOP = GL_LINE_LOOP,
+    LINES = GL_LINES,
+    TRIANGLE_STRIP = GL_TRIANGLE_STRIP,
+    TRIANGLE_FAN = GL_TRIANGLE_FAN,
+    TRIANGLES = GL_TRIANGLES
+};
+
+struct SAPI Vertex {
+    Vec2 position;
+    Vec2 texCord;
+};
 
 struct SAPI VertexBuffer {
     u32 rendererID;
@@ -42,10 +58,32 @@ struct SAPI Shader {
     char* fsFilePath;
 };
 
+struct SAPI Texture2D {
+    u32 rendererID;
+    char* filePath;
+    i32 width, height;
+    i32 nrChannel;
+};
+
+struct RendererContext {
+    Mat4 projMatrix;
+    Mat4 viewMatrix;
+    Shader boundShader;
+    VertexBufferLayout layout;
+};
+
+extern RendererContext rContext;
+
 SAPI void GLClearError();
 SAPI bool8 GLLogCall(const char* function);
 
+SAPI void RendererStartup(f32 width, f32 height);
+SAPI void RendererShutdown();
+SAPI void RendererCreateViewport(f32 width, f32 height);
+SAPI void RendererSetPolygonMode(u32 face, u32 mode);
+
 SAPI VertexBuffer VertexBufferInit(const void* data, u32 size);
+SAPI VertexBuffer VertexBufferInit(const Vertex* data, u32 count);
 SAPI void VertexBufferDelete(VertexBuffer* vb);
 SAPI void VertexBufferBind(const VertexBuffer* vb);
 SAPI void VertexBufferUnbind();
@@ -66,6 +104,7 @@ SAPI void VertexBufferLayoutDelete(VertexBufferLayout* layout);
 SAPI void VertexBufferLayoutPushFloat(VertexBufferLayout* layout, u32 count);
 SAPI void VertexBufferLayoutPushUInt(VertexBufferLayout* layout, u32 count);
 SAPI void VertexBufferLayoutPushUByte(VertexBufferLayout* layout, u32 count);
+SAPI void VertexBufferLayoutPushVec2(VertexBufferLayout* layout, u32 count);
 
 SAPI Shader ShaderLoadFromFiles(const char* vsFilePath, const char* fsFilePath);
 SAPI void ShaderDelete(Shader* shader);
@@ -81,5 +120,17 @@ SAPI void ShaderSetUniform4f(Shader* shader, const char* uniformName, Vec4 v);
 SAPI void ShaderSetUniform1i(Shader* shader, const char* uniformName, i32 v);
 SAPI void ShaderSetMatrix4(Shader* shader, const char* uniformName, Mat4 mat);
 
-SAPI void DrawLowLevel(const VertexArray* va, const IndexBuffer* ib, const Shader* shader);
-SAPI void DrawLowLevel(const VertexArray* va, const Shader* shader, u32 count);
+SAPI const Texture2D* TextureDefault();
+SAPI Texture2D TextureLoadFromMemory(unsigned char* data, i32 width, i32 height);
+SAPI void TextureDelete(Texture2D* texture);
+SAPI void TextureBind(const Texture2D* texture, i32 slot);
+SAPI void TextureUnbind();
+
+SAPI void RendererDraw(DrawMode mode, const VertexArray* va, const IndexBuffer* ib, const Texture2D* texture,
+                       Mat4 modelMatrix = Matrix4Identity());
+SAPI void RendererDraw(DrawMode mode, const VertexArray* va, u32 count, const Texture2D* texture,
+                       Mat4 transformMatrix = Matrix4Identity());
+SAPI void RendererDraw(DrawMode mode, const VertexBuffer* vb, u32 count, const Texture2D* texture,
+                       Mat4 transformMatrix = Matrix4Identity());
+SAPI void RendererDraw(DrawMode mode, const Vertex* vertices, u32 count, const Texture2D* texture,
+                       Mat4 transformMatrix = Matrix4Identity());

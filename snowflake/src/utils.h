@@ -1,4 +1,5 @@
 #pragma once
 
-SAPI char* LoadFile(const char* filePath);
-SAPI void UnloadFile(char* data);
+SAPI char* FileLoad(const char* filePath);
+SAPI u8* FileLoadBinary(const char* filePath);
+SAPI void FileUnload(void* data);

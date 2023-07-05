@@ -24,9 +24,6 @@ int main()
     SASSERT(IsVsyncEnabled() == false);
 
     SetWindowSize(800, 600);
-//    LOG_INFO("Screen Size: %dx%d", (i32) GetWindowSize().x, (i32) GetWindowSize().y);
-//    SASSERT(GetWindowWidth() == 1280);
-//    SASSERT(GetWindowHeight() == 720);
 
     SetWindowPosition(100, 100);
     MaximizeWindow();
@@ -52,43 +49,12 @@ int main()
     SASSERT(Square(-2) == 4);
     SASSERT(Square(-2.0f) == 4.0f);
 
-    // @formatter:off
-    f32 vertices[] = {
-        // Position  // Color
-        0.0f,  0.5f, 1.0f, 0.0f, 0.0f,
-       -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-        0.5f, -0.5f, 0.0f, 0.0f, 1.0f
-    };
-    // @formatter:on
-
-    u32 indices[] = {
-        0, 1, 2
-    };
-
-    Shader shader = ShaderLoadFromFiles("../resources/shaders/basic_vertex.glsl",
-                                        "../resources/shaders/basic_fragment.glsl");
-    VertexArray va = VertexArrayInit();
-    VertexBuffer vb = VertexBufferInit(vertices, sizeof(vertices));
-    {
-        VertexBufferLayout layout = VertexBufferLayoutInit();
-        VertexBufferLayoutPushFloat(&layout, 2);
-        VertexBufferLayoutPushFloat(&layout, 3);
-        VertexArrayAddBuffer(&va, &vb, &layout);
-        VertexBufferLayoutDelete(&layout);
-    }
-
-    IndexBuffer ib = IndexBufferInit(indices, 3);
-
-    Mat4 proj = MatrixOrthogonal(0.0f, 800.0f, 600.0f, 0.0f, 0.0f, 1.0f);
-    // NOTE: Flip Y-axis
-    proj = MatrixScale(proj, Vec3{ 1.0f, -1.0f, 1.0f });
-
-    Mat4 view = Matrix4Identity();
-    view = MatrixTranslate(view, Vec3{ 0.0f, 0.0f, 0.0f });
-
-    Mat4 model = Matrix4Identity();
-    model = MatrixTranslate(model, Vec3{ 400.0f, -300.0f, 0.0f });
-    model = MatrixScale(model, Vec3{ 300, 300, 1 });
+    f32 width = 50.0f;
+    f32 height = 50.0f;
+    f32 padding = 20.0f;
+    i32 countX = (GetWindowWidth() - (padding * 2)) / width;
+    i32 countY = (GetWindowHeight() - (padding * 2)) / height;
+    LOG_DEBUG("Rectangles count:%d, Triangles count:%d", countX * countY, countX * countY * 2);
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -106,7 +72,14 @@ int main()
 
         {
             if (IsKeyPressed(KEY_1)) {
+                RendererSetPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 LOG_DEBUG("'%d' Key is Pressed", KEY_1);
+            }
+            if (IsKeyPressed(KEY_2)) {
+                RendererSetPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            }
+            if (IsKeyPressed(KEY_3)) {
+                RendererSetPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
             }
             if (IsKeyReleased(KEY_1)) {
                 LOG_DEBUG("'%d' Key is Released", KEY_1);
@@ -123,20 +96,44 @@ int main()
             }
         }
 
-        model = MatrixRotate(model, GetFrameTime(), Vec3{ 0.0f, 0.0f, 1.0f });
-        Mat4 mvp = proj * view * model;
-        ShaderSetMatrix4(&shader, "uMvp", mvp);
+        {
+            for (int i = 0; i < countX; ++i) {
+                for (int j = 0; j < countY; ++j) {
+                    RectangleShape rect = CreateRectangle(padding + i * (width + padding),
+                                                          padding + j * (height + padding),
+                                                          width, height, ANGLEBLUE);
+                    rect.transform.rotation = Sin((f32) GetTime());
+                    rect.transform.origin = Vec2{ 0.5f * rect.width, 0.5f * rect.height };
+                    DrawRectanglePro(&rect);
+                }
+            }
 
-        DrawLowLevel(&va, &ib, &shader);
+            f32 scrWidth = GetWindowWidth();
+            f32 scrHeight = GetWindowHeight();
+
+            Vec2 v1 = { scrWidth / 2.0f, scrHeight / 2.0f - 100.0f };
+            Vec2 v2 = { scrWidth / 2.0f - 100.0f, scrHeight / 2.0f + 100.0f };
+            Vec2 v3 = { scrWidth / 2.0f + 100.0f, scrHeight / 2.0f + 100.0f };
+
+            DrawPixel(scrWidth - 100.0f, 50.0f, WHITE);
+            DrawPixel(scrWidth - 150.0f, 50.0f, WHITE);
+            DrawLine(500.0f, 50.0f, 600.0f, 50.0f, 1.0f, DEEPMAGENTA);
+
+            CircleShape circle = CircleCreate(0.0f, 0.0f, 40.0f, GLOSSYCYAN);
+            DrawCirclePro(&circle);
+
+            EllipseShape ellipse = EllipseCreate(100.0f, 0.0f, 20.0f, 40.0f, GOLD);
+            DrawEllipsePro(&ellipse);
+
+            RingShape ring = RingCreate(200.0f, 0.0f, 35.0f, 40.0f, COSMICPINK);
+            DrawRingPro(&ring);
+
+            DrawTriangle(v1, v2, v3, CANDYPURPLE);
+        }
 
         EndDrawing();
         PollInputEvents();
     }
-
-    ShaderDelete(&shader);
-    VertexArrayDelete(&va);
-    VertexBufferDelete(&vb);
-    IndexBufferDelete(&ib);
 
     CloseWindow();
 

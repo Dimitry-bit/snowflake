@@ -118,6 +118,8 @@ bool8 InitWindow(const char* title, i32 width, i32 height, i32 cFlags)
         LOG_TRACE("GLEW initialized successfully");
     }
 
+    RendererStartup((f32) width, (f32) height);
+
     LOG_INFO("Snowflake initialized successfully");
 
     return true;
@@ -125,6 +127,8 @@ bool8 InitWindow(const char* title, i32 width, i32 height, i32 cFlags)
 
 void CloseWindow()
 {
+    RendererShutdown();
+
     glfwTerminate();
 
     windowHandle = nullptr;
@@ -414,7 +418,7 @@ bool8 IsMouseUp(MouseButton button)
 
 static void WindowSizeCallback(GLFWwindow* window, i32 width, i32 height)
 {
-    GLCall(glViewport(0, 0, width, height));
+    RendererCreateViewport(width, height);
     LOG_TRACE("WindowResizeCallback: (NewWidth:%d, NewHeight:%d)", width, height);
 }
 
