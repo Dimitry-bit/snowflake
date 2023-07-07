@@ -49,12 +49,7 @@ int main()
     SASSERT(Square(-2) == 4);
     SASSERT(Square(-2.0f) == 4.0f);
 
-    f32 width = 50.0f;
-    f32 height = 50.0f;
-    f32 padding = 20.0f;
-    i32 countX = (GetWindowWidth() - (padding * 2)) / width;
-    i32 countY = (GetWindowHeight() - (padding * 2)) / height;
-    LOG_DEBUG("Rectangles count:%d, Triangles count:%d", countX * countY, countX * countY * 2);
+    Texture2D tex = TextureLoadFromFile("../resources/wall.bmp");
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -97,14 +92,22 @@ int main()
         }
 
         {
-            for (int i = 0; i < countX; ++i) {
-                for (int j = 0; j < countY; ++j) {
-                    RectangleShape rect = CreateRectangle(padding + i * (width + padding),
-                                                          padding + j * (height + padding),
-                                                          width, height, ANGLEBLUE);
-                    rect.transform.rotation = Sin((f32) GetTime());
-                    rect.transform.origin = Vec2{ 0.5f * rect.width, 0.5f * rect.height };
-                    DrawRectanglePro(&rect);
+            {
+                f32 width = 50.0f;
+                f32 height = 50.0f;
+                f32 padding = 20.0f;
+                i32 countX = (GetWindowWidth() - (padding * 2)) / width;
+                i32 countY = (GetWindowHeight() - (padding * 2)) / height;
+                for (i32 i = 0; i < countX; ++i) {
+                    for (i32 j = 0; j < countY; ++j) {
+                        f32 posX = padding + i * (width + padding);
+                        f32 posY = padding + j * (height + padding);
+                        Sprite sprite = SpriteCreate(posX, posY, width, height);
+                        sprite.transform.rotation = Sin((f32) GetTime());
+                        sprite.transform.origin = Vec2{ 0.5f * sprite.width, 0.5f * sprite.height };
+                        sprite.texture = &tex;
+                        DrawSprite(&sprite);
+                    }
                 }
             }
 
@@ -134,6 +137,8 @@ int main()
         EndDrawing();
         PollInputEvents();
     }
+
+    TextureDelete(&tex);
 
     CloseWindow();
 

@@ -4,6 +4,7 @@
 
 #include "snowflake.h"
 #include "srenderer_internal.h"
+#include "simage_loader.h"
 
 static u32 GLGetSizeofType(u32 type);
 
@@ -560,9 +561,27 @@ void ShaderSetMatrix4(Shader* shader, const char* uniformName, Mat4 mat)
     }
 }
 
-Texture2D TextureLoadFromMemory(unsigned char* data, i32 width, i32 height)
+Texture2D TextureLoadFromFile(const char* filePath)
+{
+    i32 width = 0;
+    i32 height = 0;
+    i32 nrChannels = 0;
+
+    u8* data = SImageLoad(filePath, &width, &height, &nrChannels);
+    Texture2D texture = TextureLoadFromMemory(data, width, height);
+    SImageUnload(data);
+
+    return texture;
+}
+
+Texture2D TextureLoadFromMemory(u8* data, i32 width, i32 height)
 {
     Texture2D texture = { };
+
+    if (!data) {
+        return texture;
+    }
+
     texture.width = width;
     texture.height = height;
 

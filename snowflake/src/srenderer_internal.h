@@ -121,7 +121,8 @@ SAPI void ShaderSetUniform1i(Shader* shader, const char* uniformName, i32 v);
 SAPI void ShaderSetMatrix4(Shader* shader, const char* uniformName, Mat4 mat);
 
 SAPI const Texture2D* TextureDefault();
-SAPI Texture2D TextureLoadFromMemory(unsigned char* data, i32 width, i32 height);
+SAPI Texture2D TextureLoadFromFile(const char* filePath);
+SAPI Texture2D TextureLoadFromMemory(u8* data, i32 width, i32 height);
 SAPI void TextureDelete(Texture2D* texture);
 SAPI void TextureBind(const Texture2D* texture, i32 slot);
 SAPI void TextureUnbind();
