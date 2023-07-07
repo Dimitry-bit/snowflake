@@ -4,21 +4,21 @@
 
 struct Texture2D;
 
-struct Transform {
+struct SAPI Transform {
     Vec2 position;
     Vec2 scale;
     Vec2 origin;
     f32 rotation;
 };
 
-struct CircleShape {
+struct SAPI CircleShape {
     Transform transform;
     Color color;
     i32 pointCount;
     f32 radius;
 };
 
-struct EllipseShape {
+struct SAPI EllipseShape {
     Transform transform;
     Color color;
     i32 pointCount;
@@ -26,7 +26,7 @@ struct EllipseShape {
     f32 radiusV;
 };
 
-struct RingShape {
+struct SAPI RingShape {
     Transform transform;
     Color color;
     i32 quadCount;
@@ -34,14 +34,14 @@ struct RingShape {
     f32 outerRadius;
 };
 
-struct RectangleShape {
+struct SAPI RectangleShape {
     Transform transform;
     Color color;
     f32 width;
     f32 height;
 };
 
-struct Sprite {
+struct SAPI Sprite {
     Transform transform;
     Color color;
     f32 width;
