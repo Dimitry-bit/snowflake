@@ -1,6 +1,6 @@
-#include <cstring>
 #include "simage_loader.h"
 #include "utils.h"
+#include "smemory.h"
 
 #ifdef __GNUC__
 #define PACK(__Declaration__) __Declaration__ __attribute__((__packed__))
@@ -57,7 +57,7 @@ u8* SImageLoad(const char* filePath, i32* width, i32* height, i32* nrChannels)
 
 void SImageUnload(void* data)
 {
-    free(data);
+    SFree(data);
 }
 
 static u8* SImageLoadBmp(const char* filePath, i32* width, i32* height, i32* nrChannels)
@@ -100,11 +100,11 @@ static u8* SImageLoadBmp(const char* filePath, i32* width, i32* height, i32* nrC
                           (((p >> alphaShift) & 0xFF) << 24);
     }
 
-    u32* imageData = (u32*) calloc(imageDataSize, sizeof(*imageData));
+    u32* imageData = (u32*) SMalloc(imageDataSize * sizeof(*imageData), MEMORY_TAG_TEXTURE);
     for (i32 r = 0; r < infoHeader.height; r++) {
         u32* src = &tmpImageData[r * infoHeader.width];
         u32* dst = &imageData[(infoHeader.height - r - 1) * infoHeader.width];
-        memcpy(dst, src, 4 * infoHeader.width);
+        SMemCopy(dst, src, 4 * infoHeader.width);
     }
     FileUnload(file);
 

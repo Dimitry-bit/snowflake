@@ -4,6 +4,7 @@
 
 #include "snowflake.h"
 #include "srenderer_internal.h"
+#include "smemory.h"
 
 #define ERROR_STR_WINDOW_INIT "Window is not initialized, Invoke InitWindow()"
 #define MAX_KEYBOARD_KEYS 512
@@ -118,6 +119,7 @@ bool8 InitWindow(const char* title, i32 width, i32 height, i32 cFlags)
         LOG_TRACE("GLEW initialized successfully");
     }
 
+    MemoryStartup();
     RendererStartup((f32) width, (f32) height);
 
     LOG_INFO("Snowflake initialized successfully");
@@ -146,9 +148,10 @@ void CloseWindow()
 
     mouseWheelMovement = Vector2Zero();
 
-    memset(&time, 0, sizeof(time));
-    memset(&fps, 0, sizeof(FPS));
+    SMemSet(&time, 0, sizeof(time));
+    SMemSet(&fps, 0, sizeof(FPS));
 
+    MemoryShutdown();
     LOG_INFO("Snowflake window closed successfully");
 }
 

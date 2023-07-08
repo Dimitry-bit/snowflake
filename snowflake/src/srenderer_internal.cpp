@@ -5,6 +5,7 @@
 #include "snowflake.h"
 #include "srenderer_internal.h"
 #include "simage_loader.h"
+#include "smemory.h"
 
 static u32 GLGetSizeofType(u32 type);
 
@@ -24,8 +25,8 @@ bool8 GLLogCall(const char* function)
 {
     if (u32 error = glGetError()) {
         u32 errorMsgLen = 256;
-        char* errorMsg = (char*) alloca(errorMsgLen);
-        memset(errorMsg, '\0', errorMsgLen);
+        char* errorMsg = (char*) SAlloca(errorMsgLen);
+        SMemSet(errorMsg, '\0', errorMsgLen);
 
         switch (error) {
             case GL_INVALID_ENUM: {
@@ -114,7 +115,7 @@ void RendererShutdown()
     // NOTE(Tony): Delete default shader
     // NOTE(Tony): Delete default texture
 
-    memset(&rContext, 0, sizeof(RendererContext));
+    SMemSet(&rContext, 0, sizeof(RendererContext));
 
     LOG_INFO("Renderer Shutdown");
 }
@@ -157,7 +158,7 @@ void VertexBufferDelete(VertexBuffer* vb)
 
     GLCall(glDeleteBuffers(1, &vb->rendererID));
 
-    memset(vb, 0, sizeof(VertexBuffer));
+    SMemSet(vb, 0, sizeof(VertexBuffer));
 }
 
 void VertexBufferBind(const VertexBuffer* vb)
@@ -189,7 +190,7 @@ void IndexBufferDelete(IndexBuffer* ib)
 
     GLCall(glDeleteBuffers(1, &ib->rendererID));
 
-    memset(ib, 0, sizeof(IndexBuffer));
+    SMemSet(ib, 0, sizeof(IndexBuffer));
 }
 
 void IndexBufferBind(const IndexBuffer* ib)
@@ -216,7 +217,7 @@ void VertexArrayDelete(VertexArray* va)
     SASSERT_MSG(va, "VertexArray can't be null");
     GLCall(glDeleteVertexArrays(1, &va->rendererID));
 
-    memset(va, 0, sizeof(VertexArray));
+    SMemSet(va, 0, sizeof(VertexArray));
 }
 
 void VertexArrayAddBuffer(const VertexArray* va, const VertexBuffer* vb, const VertexBufferLayout* layout)
@@ -263,7 +264,7 @@ void VertexBufferLayoutDelete(VertexBufferLayout* layout)
     while (layout->elementsBegin) {
         tmp = layout->elementsBegin;
         layout->elementsBegin = layout->elementsBegin->next;
-        free(tmp);
+        SFree(tmp);
     }
 
     layout->elementsBegin = nullptr;
@@ -274,7 +275,7 @@ void VertexBufferLayoutPushFloat(VertexBufferLayout* layout, u32 count)
 {
     SASSERT(layout);
 
-    VertexBufferElement* element = (VertexBufferElement*) calloc(1, sizeof(VertexBufferElement));
+    VertexBufferElement* element = (VertexBufferElement*) SMalloc(sizeof(VertexBufferElement), MEMORY_TAG_RENDERER);
     element->type = GL_FLOAT;
     element->count = count;
     element->normalized = GL_FALSE;
@@ -293,7 +294,7 @@ void VertexBufferLayoutPushUInt(VertexBufferLayout* layout, u32 count)
 {
     SASSERT(layout);
 
-    VertexBufferElement* element = (VertexBufferElement*) calloc(1, sizeof(VertexBufferElement));
+    VertexBufferElement* element = (VertexBufferElement*) SMalloc(sizeof(VertexBufferElement), MEMORY_TAG_RENDERER);
     element->type = GL_UNSIGNED_INT;
     element->count = count;
     element->normalized = GL_FALSE;
@@ -312,7 +313,7 @@ void VertexBufferLayoutPushUByte(VertexBufferLayout* layout, u32 count)
 {
     SASSERT(layout);
 
-    VertexBufferElement* element = (VertexBufferElement*) calloc(1, sizeof(VertexBufferElement));
+    VertexBufferElement* element = (VertexBufferElement*) SMalloc(sizeof(VertexBufferElement), MEMORY_TAG_RENDERER);
     element->type = GL_UNSIGNED_BYTE;
     element->count = count;
     element->normalized = GL_FALSE;
@@ -331,7 +332,7 @@ void VertexBufferLayoutPushVec2(VertexBufferLayout* layout, u32 count)
 {
     SASSERT(layout);
 
-    VertexBufferElement* element = (VertexBufferElement*) calloc(1, sizeof(VertexBufferElement));
+    VertexBufferElement* element = (VertexBufferElement*) SMalloc(sizeof(VertexBufferElement), MEMORY_TAG_RENDERER);
     element->type = GL_FLOAT;
     element->count = 2 * count;
     element->normalized = GL_FALSE;
@@ -354,12 +355,12 @@ Shader ShaderLoadFromFiles(const char* vsFilePath, const char* fsFilePath)
     char* fragmentShader = FileLoad(fsFilePath);
 
     u64 vsFilePathLen = strlen(vsFilePath);
-    result.vsFilePath = (char*) malloc(vsFilePathLen + 1);
-    memcpy(result.vsFilePath, vsFilePath, vsFilePathLen + 1);
+    result.vsFilePath = (char*) SMalloc(vsFilePathLen + 1, MEMORY_TAG_STRING);
+    SMemCopy(result.vsFilePath, vsFilePath, vsFilePathLen + 1);
 
     u64 fsFilePathLen = strlen(fsFilePath);
-    result.fsFilePath = (char*) malloc(fsFilePathLen + 1);
-    memcpy(result.fsFilePath, fsFilePath, fsFilePathLen + 1);
+    result.fsFilePath = (char*) SMalloc(fsFilePathLen + 1, MEMORY_TAG_STRING);
+    SMemCopy(result.fsFilePath, fsFilePath, fsFilePathLen + 1);
 
     result.rendererID = ShaderCreate(vertexShader, fragmentShader);
 
@@ -375,12 +376,12 @@ void ShaderDelete(Shader* shader)
 {
     SASSERT_MSG(shader, "Shader can't be null");
 
-    free(shader->vsFilePath);
-    free(shader->fsFilePath);
+    SFree(shader->vsFilePath);
+    SFree(shader->fsFilePath);
     GLCall(glDeleteProgram(shader->rendererID));
 
     LOG_TRACE("Shader(ID:%d): Deleted successfully", shader->rendererID);
-    memset(shader, 0, sizeof(Shader));
+    SMemSet(shader, 0, sizeof(Shader));
 }
 
 static i32 ShaderGetUniformLocation(Shader* shader, const char* uniformName)
@@ -423,7 +424,7 @@ static u32 ShaderCreate(char* vertexShader, char* fragmentShader)
     if (!success) {
         i32 length;
         GLCall(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length));
-        char* msg = (char*) alloca(length * sizeof(char));
+        char* msg = (char*) SAlloca(length * sizeof(char));
         GLCall(glGetProgramInfoLog(program, length, &length, msg));
         LOG_ERROR("[OpenGL Error] Shader Validation Failed '%s' for ", msg);
         GLCall(glDeleteProgram(program));
@@ -448,7 +449,7 @@ static u32 ShaderCompile(u32 type, char* source)
     if (!success) {
         i32 length;
         GLCall(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length));
-        char* msg = (char*) alloca(length * sizeof(char));
+        char* msg = (char*) SAlloca(length * sizeof(char));
         GLCall(glGetShaderInfoLog(id, length, &length, msg));
         LOG_ERROR("[OpenGL Error] Failed to compile '%s' shader, %s",
                   (type == GL_VERTEX_SHADER ? "vertex" : "fragment"), msg);
@@ -619,7 +620,7 @@ void TextureDelete(Texture2D* texture)
     SASSERT(texture);
 
     GLCall(glDeleteTextures(1, &texture->rendererID));
-    memset(texture, 0, sizeof(Texture2D));
+    SMemSet(texture, 0, sizeof(Texture2D));
 }
 
 void TextureBind(const Texture2D* texture, i32 slot)

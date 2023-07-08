@@ -3,6 +3,7 @@
 #include "snowflake.h"
 #include "srenderer.h"
 #include "srenderer_internal.h"
+#include "smemory.h"
 
 int main()
 {
@@ -63,6 +64,8 @@ int main()
     SASSERT(strncmp(path.data, "../resources/", path.length) == 0 && path.length == 13);
     LOG_DEBUG("FileName '%.*s', Extension '%.*s', FileNameOnly '%.*s', Path '%.*s'",
               fn.length, fn.data, fe.length, fe.data, fne.length, fne.data, path.length, path.data);
+
+    LOG_INFO(SMemUsage());
 
     while (!WindowShouldClose()) {
         BeginDrawing();

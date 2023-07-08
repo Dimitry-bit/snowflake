@@ -2,6 +2,7 @@
 #include <cstdio>
 
 #include "snowflake.h"
+#include "smemory.h"
 
 char* FileLoad(const char* filePath)
 {
@@ -22,7 +23,7 @@ char* FileLoad(const char* filePath)
             return nullptr;
         }
 
-        data = (char*) malloc((bufSize + 1) * sizeof(char));
+        data = (char*) SMalloc((bufSize + 1) * sizeof(char), MEMORY_TAG_STRING);
         if (!data) {
             LOG_ERROR("'%s' Failed to allocate memory", filePath);
         }
@@ -30,7 +31,7 @@ char* FileLoad(const char* filePath)
         if (fseek(fp, 0, SEEK_SET) != 0) {
             LOG_ERROR("'%s' Failed to read file", filePath);
             fclose(fp);
-            free(data);
+            SFree(data);
             return nullptr;
         }
 
@@ -38,7 +39,7 @@ char* FileLoad(const char* filePath)
         if (ferror(fp) != 0) {
             LOG_ERROR("'%s' Failed to read file", filePath);
             fclose(fp);
-            free(data);
+            SFree(data);
             return nullptr;
         }
 
@@ -69,7 +70,7 @@ u8* FileLoadBinary(const char* filePath)
             return nullptr;
         }
 
-        data = (u8*) malloc(bufSize * sizeof(u8));
+        data = (u8*) SMalloc(bufSize * sizeof(u8), MEMORY_TAG_ARRAY);
         if (!data) {
             LOG_ERROR("'%s' Failed to allocate memory", filePath);
         }
@@ -77,15 +78,15 @@ u8* FileLoadBinary(const char* filePath)
         if (fseek(fp, 0, SEEK_SET) != 0) {
             LOG_ERROR("'%s' Failed to read file", filePath);
             fclose(fp);
-            free(data);
+            SFree(data);
             return nullptr;
         }
 
-        u64 len = fread(data, sizeof(char), bufSize, fp);
+        fread(data, sizeof(char), bufSize, fp);
         if (ferror(fp) != 0) {
             LOG_ERROR("'%s' Failed to read file", filePath);
             fclose(fp);
-            free(data);
+            SFree(data);
             return nullptr;
         }
 
@@ -98,7 +99,7 @@ u8* FileLoadBinary(const char* filePath)
 
 void FileUnload(void* data)
 {
-    free(data);
+    SFree(data);
 }
 
 StringViewer FileGetExtension(const char* filePath)

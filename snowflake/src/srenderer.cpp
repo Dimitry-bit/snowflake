@@ -1,8 +1,8 @@
-#include <cstring>
 #include "GL/glew.h"
 
 #include "srenderer.h"
 #include "srenderer_internal.h"
+#include "smemory.h"
 
 void ClearBackground(u8 r, u8 g, u8 b, u8 a)
 {
@@ -60,8 +60,8 @@ void DrawCirclePro(f32 radius, i32 pointCount, const Transform* transform, Color
 
     i32 vertexCount = (pointCount + 2);
     i64 verticesSize = vertexCount * sizeof(Vertex);
-    Vertex* vertices = (Vertex*) alloca(verticesSize);
-    memset(vertices, 0, verticesSize);
+    Vertex* vertices = (Vertex*) SAlloca(verticesSize);
+    SMemSet(vertices, 0, verticesSize);
 
     vertices[0].position.x = 0;
     vertices[0].position.y = 0;
@@ -117,8 +117,8 @@ void DrawEllipsePro(f32 radiusH, f32 radiusV, i32 pointCount, const Transform* t
 
     i32 vertexCount = (pointCount + 2);
     i64 verticesSize = vertexCount * sizeof(Vertex);
-    Vertex* vertices = (Vertex*) alloca(verticesSize);
-    memset(vertices, 0, verticesSize);
+    Vertex* vertices = (Vertex*) SAlloca(verticesSize);
+    SMemSet(vertices, 0, verticesSize);
 
     vertices[0].position.x = 0;
     vertices[0].position.y = 0;
@@ -173,8 +173,8 @@ void DrawRingPro(f32 innerRadius, f32 outerRadius, i32 quadCount, const Transfor
     SASSERT(transform);
 
     i64 verticesSize = 6 * quadCount * sizeof(Vertex);
-    Vertex* vertices = (Vertex*) alloca(verticesSize);
-    memset(vertices, 0, verticesSize);
+    Vertex* vertices = (Vertex*) SAlloca(verticesSize);
+    SMemSet(vertices, 0, verticesSize);
 
     if (outerRadius < innerRadius) {
         f32 tmp = outerRadius;

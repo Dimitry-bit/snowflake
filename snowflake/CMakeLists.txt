@@ -22,7 +22,8 @@ target_compile_options(snowflake PRIVATE
 target_compile_options(snowflake PUBLIC
         -DASSERTION_ENABLED
         "$<$<CONFIG:RELEASE>:-DSNOWFLAKE_RELEASE>"
-        "$<$<CONFIG:DEBUG>:-DSNOWFLAKE_DEBUG>")
+        "$<$<CONFIG:DEBUG>:-DSNOWFLAKE_DEBUG>"
+        "$<$<CONFIG:DEBUG>:-DSNOWFLAKE_MEM_DEBUG>")
 
 target_compile_options(snowflake PRIVATE
         -DASSERTION_ENABLED
