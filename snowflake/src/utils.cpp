@@ -1,4 +1,6 @@
+#include <cstring>
 #include <cstdio>
+
 #include "snowflake.h"
 
 char* FileLoad(const char* filePath)
@@ -97,4 +99,81 @@ u8* FileLoadBinary(const char* filePath)
 void FileUnload(void* data)
 {
     free(data);
+}
+
+StringViewer FileGetExtension(const char* filePath)
+{
+    StringViewer result = { };
+
+    u32 len = strlen(filePath);
+    const char* s = filePath + len;
+    result.data = s;
+    for (; s != filePath; s--) {
+        if (*s == '.') {
+            result.data = s;
+            result.length = (filePath + len) - s;
+            break;
+        }
+    }
+
+    return result;
+}
+
+StringViewer FileGetFileName(const char* filePath)
+{
+    StringViewer result = { };
+
+    u32 len = strlen(filePath);
+    const char* s = filePath + len;
+    result.data = filePath;
+    result.length = len;
+    for (; s != filePath; s--) {
+        if (*s == '/') {
+            result.data = ++s;
+            result.length = (filePath + len) - s;
+            break;
+        }
+    }
+
+    return result;
+}
+
+StringViewer FileGetFileNameNoExtension(const char* filePath)
+{
+    StringViewer result = { };
+
+    u32 len = strlen(filePath);
+    const char* s = filePath + len;
+    result.data = filePath;
+    result.length = len;
+
+    u32 extensionLen = 0;
+    for (; s != filePath; s--) {
+        if (*s == '/') {
+            result.data = ++s;
+            result.length = (filePath + len) - s - extensionLen;
+            break;
+        } else if (*s == '.') {
+            extensionLen = (filePath + len) - s;
+        }
+    }
+
+    return result;
+}
+
+StringViewer FileGetPath(const char* filePath)
+{
+    StringViewer result = { };
+
+    u32 len = strlen(filePath);
+    const char* s = filePath + len;
+    result.data = filePath;
+    for (; s != filePath; s--) {
+        if (*s == '/') {
+            result.length = (s - filePath) + 1;
+            break;
+        }
+    }
+
+    return result;
 }

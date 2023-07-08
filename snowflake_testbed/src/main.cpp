@@ -1,3 +1,4 @@
+#include <cstring>
 #include <cstdio>
 #include "snowflake.h"
 #include "srenderer.h"
@@ -50,6 +51,18 @@ int main()
     SASSERT(Square(-2.0f) == 4.0f);
 
     Texture2D tex = TextureLoadFromFile("../resources/wall.bmp");
+
+    StringViewer fn = FileGetFileName("../resources/wall.bmp");
+    StringViewer fe = FileGetExtension("../resources/wall.bmp");
+    StringViewer fne = FileGetFileNameNoExtension("../resources/wall.bmp");
+    StringViewer path = FileGetPath("../resources/wall.bmp");
+
+    SASSERT(strncmp(fn.data, "wall.bmp", fn.length) == 0 && fn.length == 8);
+    SASSERT(strncmp(fe.data, ".bmp", fe.length) == 0 && fe.length == 4);
+    SASSERT(strncmp(fne.data, "wall", fne.length) == 0 && fne.length == 4);
+    SASSERT(strncmp(path.data, "../resources/", path.length) == 0 && path.length == 13);
+    LOG_DEBUG("FileName '%.*s', Extension '%.*s', FileNameOnly '%.*s', Path '%.*s'",
+              fn.length, fn.data, fe.length, fe.data, fne.length, fne.data, path.length, path.data);
 
     while (!WindowShouldClose()) {
         BeginDrawing();
