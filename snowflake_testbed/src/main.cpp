@@ -10,6 +10,7 @@ static void TestMathFunctions();
 static void TestFileFunctions();
 static void TestInput();
 static void TestPrimitiveShapes();
+static void TestTextureDrawing(const Texture2D* texture);
 
 int main()
 {
@@ -23,13 +24,13 @@ int main()
     TestMathFunctions();
     TestFileFunctions();
 
-    Texture2D tex = TextureLoadFromFile("../resources/wall.bmp");
+    Texture2D tex = TextureLoadFromFile("../resources/RPGpack_sheet.bmp");
 
     LOG_INFO(SMemUsage());
 
     while (!WindowShouldClose()) {
         BeginDrawing();
-        ClearBackground(SNOWWHITE);
+        ClearBackground(OLDBLACK);
 
         {
             const u32 titleLen = 512;
@@ -42,7 +43,8 @@ int main()
         }
 
         TestInput();
-        TestPrimitiveShapes();
+//        TestPrimitiveShapes();
+        TestTextureDrawing(&tex);
 
         EndDrawing();
         PollInputEvents();
@@ -153,10 +155,10 @@ static void TestPrimitiveShapes()
         for (i32 j = 0; j < countY; ++j) {
             f32 posX = padding + i * (width + padding);
             f32 posY = padding + j * (height + padding);
-            Sprite sprite = SpriteCreate(posX, posY, width, height, ANGLEBLUE);
-            sprite.transform.rotation = Sin((f32) GetTime());
-            sprite.transform.origin = Vec2{ 0.5f * sprite.width, 0.5f * sprite.height };
-            DrawSprite(&sprite);
+            RectangleShape rect = RectangleCreate(posX, posY, width, height, ANGLEBLUE);
+            rect.transform.rotation = Sin((f32) GetTime());
+            rect.transform.origin = Vec2{ 0.5f * rect.width, 0.5f * rect.height };
+            DrawRectanglePro(&rect);
         }
     }
 
@@ -181,4 +183,62 @@ static void TestPrimitiveShapes()
     DrawRingPro(&ring);
 
     DrawTriangle(v1, v2, v3, CANDYPURPLE);
+}
+
+static void TestTextureDrawing(const Texture2D* texture)
+{
+    static char map[] = {
+        "WWWWWWWWWWWWWWWWWWW"
+        "WWWWGGWGGGGGWGGWWWW"
+        "WWWGGGBGGGTGGGGWWWW"
+        "WWWGGGTGGGGGGBGGWWW"
+        "WWWWGGGGGGGGTGGGWWW"
+        "WWWGGGGBGGGGGGGGWWW"
+        "WWWWGGGGGGGBGGGWWWW"
+        "WWWWWWWWWWWWWWWWWWW"
+    };
+
+    SubTexture2D barrel = SubTexture2DCreate(texture, Vec2{ 6, 12 }, Vec2{ 64, 64 }, Vector2One());
+    SubTexture2D tree = SubTexture2DCreate(texture, Vec2{ 0, 10 }, Vec2{ 64, 64 }, Vec2{ 1, 2 });
+    SubTexture2D ground = SubTexture2DCreate(texture, Vec2{ 1, 1 }, Vec2{ 64, 64 }, Vector2One());
+    SubTexture2D water = SubTexture2DCreate(texture, Vec2{ 11, 1 }, Vec2{ 64, 64 }, Vector2One());
+
+    const i32 mapWidth = 19;
+    const i32 mapHeight = 7;
+
+    f32 width = (f32) GetWindowWidth() / mapWidth;
+    f32 height = (f32) GetWindowHeight() / mapHeight;
+
+    width = Clamp(width, 0.0f, Min(width, height));
+    height = Clamp(height, 0.0f, Min(width, height));
+
+    for (i32 y = 0; y < mapHeight; y++) {
+        for (i32 x = 0; x < mapWidth; x++) {
+            Sprite tile = SpriteCreate(Vec2{ x * width, y * height }, Vec2{ width, height });
+            char tileID = map[x + y * mapWidth];
+            if (tileID == 'W') {
+                SpriteSetTexture(&tile, &water);
+                DrawSprite(&tile);
+            } else {
+                SpriteSetTexture(&tile, &ground);
+                DrawSprite(&tile);
+            }
+        }
+    }
+
+    for (i32 y = 0; y < mapHeight; y++) {
+        for (i32 x = 0; x < mapWidth; x++) {
+            Sprite tile = SpriteCreate(Vec2{ x * width, y * height }, Vec2{ width, height });
+            char tileID = map[x + y * mapWidth];
+            if (tileID == 'T') {
+                tile.height = width * 2.0f;
+                SpriteSetTexture(&tile, &tree);
+                DrawSprite(&tile);
+            } else if (tileID == 'B') {
+                tile.height = width;
+                SpriteSetTexture(&tile, &barrel);
+                DrawSprite(&tile);
+            }
+        }
+    }
 }

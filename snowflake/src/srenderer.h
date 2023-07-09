@@ -4,6 +4,19 @@
 
 struct Texture2D;
 
+struct SAPI Rectanglef {
+    f32 left, top, width, height;
+};
+
+struct SAPI Rectanglei {
+    i32 left, top, width, height;
+};
+
+struct SAPI SubTexture2D {
+    const Texture2D* texture;
+    Rectanglei rect;
+};
+
 struct SAPI Transform {
     Vec2 position;
     Vec2 scale;
@@ -43,10 +56,11 @@ struct SAPI RectangleShape {
 
 struct SAPI Sprite {
     Transform transform;
-    Color color;
+    Color tint;
     f32 width;
     f32 height;
     const Texture2D* texture;
+    Rectanglei textureRect;
 };
 
 SAPI void ClearBackground(u8 r, u8 g, u8 b, u8 a);
@@ -78,7 +92,7 @@ SAPI void DrawRectanglePro(const RectangleShape* rect);
 SAPI void DrawRectangle(Vec2 pos, Vec2 size, f32 rotation, Color color);
 SAPI void DrawRectangle(f32 left, f32 top, f32 width, f32 height, f32 rotation, Color color);
 
-SAPI void DrawSprite(const Texture2D* texture, f32 width, f32 height, const Transform* transform, Color color);
+SAPI void DrawSprite(const Texture2D* texture, Rectanglei texRect, const Transform* transform, Color tint);
 SAPI void DrawSprite(const Sprite* sprite);
 
 SAPI void DrawTriangle(Vec2 v1, Vec2 v2, Vec2 v3, Color color);
@@ -96,5 +110,9 @@ SAPI RingShape RingCreate(Vec2 pos, f32 innerRadius, f32 outerRadius, Color colo
 SAPI RectangleShape RectangleCreate(f32 x, f32 y, f32 width, f32 height, Color color = WHITE);
 SAPI RectangleShape RectangleCreate(Vec2 pos, Vec2 size, Color color = WHITE);
 
-SAPI Sprite SpriteCreate(f32 x, f32 y, f32 width, f32 height, Color color = WHITE);
-SAPI Sprite SpriteCreate(Vec2 pos, Vec2 size, Color color = WHITE);
+SAPI Sprite SpriteCreate(f32 x, f32 y, f32 width, f32 height);
+SAPI Sprite SpriteCreate(Vec2 pos, Vec2 size);
+SAPI void SpriteSetTexture(Sprite* sprite, const Texture2D* texture);
+SAPI void SpriteSetTexture(Sprite* sprite, const SubTexture2D* subTexture);
+
+SAPI SubTexture2D SubTexture2DCreate(const Texture2D* texture, Vec2 pos, Vec2 cellSize, Vec2 spriteSize);

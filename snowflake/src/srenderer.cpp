@@ -249,37 +249,7 @@ void DrawRing(Vec2 pos, f32 innerRadius, f32 outerRadius, i32 quadCount, Color c
     DrawRingPro(innerRadius, outerRadius, quadCount, &transform, color);
 }
 
-void DrawRectangle(Vec2 pos, Vec2 size, f32 rotation, Color color)
-{
-    Transform transform;
-    transform.position = pos;
-    transform.scale = Vector2One();
-    transform.rotation = rotation;
-
-    DrawSprite(nullptr, size.x, size.y, &transform, color);
-}
-
-void DrawRectangle(f32 left, f32 top, f32 width, f32 height, f32 rotation, Color color)
-{
-    Transform transform;
-    transform.position = Vec2{ left, top };
-    transform.scale = Vector2One();
-    transform.rotation = rotation;
-
-    DrawSprite(nullptr, width, height, &transform, color);
-}
-
 void DrawRectanglePro(f32 width, f32 height, const Transform* transform, Color color)
-{
-    DrawSprite(nullptr, width, height, transform, color);
-}
-
-void DrawRectanglePro(const RectangleShape* rect)
-{
-    DrawSprite(nullptr, rect->width, rect->height, &rect->transform, rect->color);
-}
-
-void DrawSprite(const Texture2D* texture, f32 width, f32 height, const Transform* transform, Color color)
 {
     SASSERT(transform);
 
@@ -304,12 +274,74 @@ void DrawSprite(const Texture2D* texture, f32 width, f32 height, const Transform
     Vec4 colorNormalized = ColorNormalize(color);
     ShaderSetUniform4f(&rContext.boundShader, "uColor", colorNormalized);
 
+    RendererDraw(TRIANGLES, vertices, 6, nullptr, transformMatrix);
+}
+
+void DrawRectanglePro(const RectangleShape* rect)
+{
+    DrawRectanglePro(rect->width, rect->height, &rect->transform, rect->color);
+}
+
+void DrawRectangle(Vec2 pos, Vec2 size, f32 rotation, Color color)
+{
+    Transform transform;
+    transform.position = pos;
+    transform.scale = Vector2One();
+    transform.rotation = rotation;
+
+    DrawRectanglePro(size.x, size.y, &transform, color);
+}
+
+void DrawRectangle(f32 left, f32 top, f32 width, f32 height, f32 rotation, Color color)
+{
+    Transform transform;
+    transform.position = Vec2{ left, top };
+    transform.scale = Vector2One();
+    transform.rotation = rotation;
+
+    DrawRectanglePro(width, height, &transform, color);
+}
+
+void DrawSprite(const Texture2D* texture, Rectanglei texRect, f32 width, f32 height,
+                const Transform* transform, Color tint)
+{
+    SASSERT(transform);
+    SASSERT(texture);
+
+    f32 texCoordLeft = (f32) texRect.left / (f32) texture->width;
+    f32 texCoordRight = (f32) (texRect.left + texRect.width) / (f32) texture->width;
+
+    // NOTE(Tony): texture is vertically flipped
+    f32 texCoordBottom = (f32) texRect.top / (f32) texture->height;
+    f32 texCoordTop = (f32) (texRect.top + texRect.height) / (f32) texture->height;
+
+    Vertex vertices[] = {
+        { Vec2{ 0, 1 }, Vec2{ texCoordLeft, texCoordTop } },
+        { Vec2{ 1, 1 }, Vec2{ texCoordRight, texCoordTop } },
+        { Vec2{ 0, 0 }, Vec2{ texCoordLeft, texCoordBottom } },
+        { Vec2{ 1, 1 }, Vec2{ texCoordRight, texCoordTop } },
+        { Vec2{ 0, 0 }, Vec2{ texCoordLeft, texCoordBottom } },
+        { Vec2{ 1, 0 }, Vec2{ texCoordRight, texCoordBottom } }
+    };
+
+    Vec3 scale = { transform->scale.x * width, transform->scale.y * height, 0.0f };
+    Vec3 originPos = { -transform->origin.x * transform->scale.x, -transform->origin.y * transform->scale.y, 0.0f };
+
+    Mat4 transformMatrix = Matrix4Identity();
+    transformMatrix = MatrixTranslate(transformMatrix, Vector3(transform->position, 0.0f));
+    transformMatrix = MatrixRotate(transformMatrix, transform->rotation, Vec3{ 0.0f, 0.0f, 1.0f });
+    transformMatrix = MatrixTranslate(transformMatrix, originPos);
+    transformMatrix = MatrixScale(transformMatrix, scale);
+
+    Vec4 colorNormalized = ColorNormalize(tint);
+    ShaderSetUniform4f(&rContext.boundShader, "uColor", colorNormalized);
+
     RendererDraw(TRIANGLES, vertices, 6, texture, transformMatrix);
 }
 
 void DrawSprite(const Sprite* sprite)
 {
-    DrawSprite(sprite->texture, sprite->width, sprite->height, &sprite->transform, sprite->color);
+    DrawSprite(sprite->texture, sprite->textureRect, sprite->width, sprite->height, &sprite->transform, sprite->tint);
 }
 
 void DrawTriangle(Vec2 v1, Vec2 v2, Vec2 v3, Color color)
@@ -400,27 +432,56 @@ RectangleShape RectangleCreate(Vec2 pos, Vec2 size, Color color)
     return RectangleCreate(pos.x, pos.y, size.x, size.y, color);
 }
 
-Sprite SpriteCreate(f32 x, f32 y, f32 width, f32 height, Color color)
+Sprite SpriteCreate(f32 x, f32 y, f32 width, f32 height)
 {
     Sprite sprite = { };
     sprite.transform.position.x = x;
     sprite.transform.position.y = y;
     sprite.transform.scale = Vector2One();
-    sprite.color = color;
+    sprite.tint = WHITE;
     sprite.width = width;
     sprite.height = height;
 
     return sprite;
 }
 
-Sprite SpriteCreate(Vec2 pos, Vec2 size, Color color)
+Sprite SpriteCreate(Vec2 pos, Vec2 size)
 {
     Sprite sprite = { };
     sprite.transform.position = pos;
     sprite.transform.scale = Vector2One();
-    sprite.color = color;
+    sprite.tint = WHITE;
     sprite.width = size.x;
     sprite.height = size.y;
 
     return sprite;
+}
+
+void SpriteSetTexture(Sprite* sprite, const Texture2D* texture)
+{
+    SASSERT(sprite);
+
+    sprite->texture = texture;
+    sprite->textureRect = Rectanglei{ 0, 0, texture->width, texture->height };
+}
+
+void SpriteSetTexture(Sprite* sprite, const SubTexture2D* subTexture)
+{
+    SASSERT(sprite);
+
+    sprite->texture = subTexture->texture;
+    sprite->textureRect = subTexture->rect;
+}
+
+SubTexture2D SubTexture2DCreate(const Texture2D* texture, Vec2 pos, Vec2 cellSize, Vec2 spriteSize)
+{
+    SubTexture2D result = { };
+    result.texture = texture;
+
+    result.rect.left = pos.x * cellSize.x;
+    result.rect.top = pos.y * cellSize.y;
+    result.rect.width = cellSize.x * spriteSize.x;
+    result.rect.height = cellSize.y * spriteSize.y;
+
+    return result;
 }
