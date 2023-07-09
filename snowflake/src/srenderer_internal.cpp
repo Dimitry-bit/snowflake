@@ -86,6 +86,9 @@ void RendererStartup(f32 width, f32 height)
 {
     SASSERT_MSG(isInit == false, "Renderer is already started");
 
+    GLCall(glEnable(GL_BLEND));
+    GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
     // NOTE(Tony): Replace with ShaderLoadFromMemory
     rContext.boundShader = ShaderLoadFromFiles("../resources/shaders/basic_vertex.glsl",
                                                "../resources/shaders/basic_fragment.glsl");
