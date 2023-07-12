@@ -4,6 +4,7 @@
 #include "srenderer.h"
 #include "srenderer_internal.h"
 #include "smemory.h"
+#include "stext.h"
 
 static void TestWindow(i32 configFlags);
 static void TestMathFunctions();
@@ -25,6 +26,9 @@ int main()
     TestFileFunctions();
 
     Texture2D tex = TextureLoadFromFile("../resources/RPGpack_sheet.bmp");
+    Font font = FontLoadFromFile("../resources/IBMPlexSans-Regular.ttf", 48);
+    Text testText = TextCreate(&font);
+    TextSetString(&testText, "Potato Man Strikes Again");
 
     LOG_INFO(SMemUsage());
 
@@ -46,11 +50,15 @@ int main()
 //        TestPrimitiveShapes();
         TestTextureDrawing(&tex);
 
+        DrawText(&testText, Vec2{ 100, 100 });
+
         EndDrawing();
         PollInputEvents();
     }
 
+    TextDelete(&testText);
     TextureDelete(&tex);
+    FontDelete(&font);
 
     CloseWindow();
 
