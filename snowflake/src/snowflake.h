@@ -8,3 +8,4 @@
 #include "color.h"
 
 #include "swindow.h"
+#include "srenderer.h"

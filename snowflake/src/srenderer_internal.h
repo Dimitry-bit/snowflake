@@ -20,11 +20,6 @@ enum SAPI DrawMode {
     TRIANGLES = GL_TRIANGLES
 };
 
-struct SAPI Vertex {
-    Vec2 position;
-    Vec2 texCord;
-};
-
 struct SAPI VertexBuffer {
     u32 rendererID;
 };
@@ -58,18 +53,6 @@ struct SAPI Shader {
     char* fsFilePath;
 };
 
-struct SAPI Texture2D {
-    u32 rendererID;
-    i32 width, height;
-    i32 nrChannel;
-};
-
-struct SAPI Image {
-    i32 width, height;
-    i32 nrChannel;
-    u8* pixels;
-};
-
 struct RendererContext {
     Mat4 projMatrix;
     Mat4 viewMatrix;
@@ -79,11 +62,11 @@ struct RendererContext {
 
 extern RendererContext rContext;
 
-SAPI void GLClearError();
-SAPI bool8 GLLogCall(const char* function);
+void GLClearError();
+bool8 GLLogCall(const char* function);
 
-SAPI void RendererStartup(f32 width, f32 height);
-SAPI void RendererShutdown();
+void RendererStartup(f32 width, f32 height);
+void RendererShutdown();
 SAPI void RendererCreateViewport(f32 width, f32 height);
 SAPI void RendererSetPolygonMode(u32 face, u32 mode);
 
@@ -124,19 +107,6 @@ SAPI void ShaderSetUniform4f(Shader* shader, const char* uniformName, f32 v0, f3
 SAPI void ShaderSetUniform4f(Shader* shader, const char* uniformName, Vec4 v);
 SAPI void ShaderSetUniform1i(Shader* shader, const char* uniformName, i32 v);
 SAPI void ShaderSetMatrix4(Shader* shader, const char* uniformName, Mat4 mat);
-
-SAPI Texture2D TextureCreate(i32 width, i32 height, Color color);
-SAPI Texture2D TextureLoadFromMemory(u8* pixels, i32 width, i32 height);
-SAPI Texture2D TextureLoadFromFile(const char* filePath);
-SAPI Texture2D TextureLoadFromImage(const Image* image);
-SAPI void TextureDelete(Texture2D* texture);
-SAPI void TextureBind(const Texture2D* texture, i32 slot);
-SAPI void TextureUnbind();
-
-SAPI Image ImageCreate(i32 width, i32 height, Color color);
-SAPI Image ImageLoadFromMemory(u8* pixels, i32 width, i32 height);
-SAPI Image ImageLoadFromFile(const char* filePath);
-SAPI void ImageDelete(Image* image);
 
 SAPI void RendererDraw(DrawMode mode, const VertexArray* va, const IndexBuffer* ib, const Texture2D* texture,
                        Mat4 modelMatrix = Matrix4Identity());

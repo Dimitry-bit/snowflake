@@ -1,9 +1,8 @@
 #include <cstring>
 #include <cstdio>
 #include "snowflake.h"
-#include "srenderer.h"
-#include "srenderer_internal.h"
 #include "smemory.h"
+#include "srenderer_internal.h"
 #include "stext.h"
 
 static void TestWindow(u32 configFlags);

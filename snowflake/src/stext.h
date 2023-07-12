@@ -2,7 +2,6 @@
 
 #include "snowflake.h"
 #include "srenderer.h"
-#include "srenderer_internal.h"
 
 struct Glyph {
     u32 width;

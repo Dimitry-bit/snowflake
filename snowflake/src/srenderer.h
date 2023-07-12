@@ -2,7 +2,22 @@
 
 #include "snowflake.h"
 
-struct Texture2D;
+struct SAPI Vertex {
+    Vec2 position;
+    Vec2 texCord;
+};
+
+struct SAPI Texture2D {
+    u32 rendererID;
+    i32 width, height;
+    i32 nrChannel;
+};
+
+struct SAPI Image {
+    i32 width, height;
+    i32 nrChannel;
+    u8* pixels;
+};
 
 struct SAPI Rectanglef {
     f32 left, top, width, height;
@@ -62,6 +77,21 @@ struct SAPI Sprite {
     const Texture2D* texture;
     Rectanglei textureRect;
 };
+
+// NOTE: Implemented in srenderer_internal.cpp
+SAPI Texture2D TextureCreate(i32 width, i32 height, Color color);
+SAPI Texture2D TextureLoadFromMemory(u8* pixels, i32 width, i32 height);
+SAPI Texture2D TextureLoadFromFile(const char* filePath);
+SAPI Texture2D TextureLoadFromImage(const Image* image);
+SAPI void TextureDelete(Texture2D* texture);
+SAPI void TextureBind(const Texture2D* texture, i32 slot);
+SAPI void TextureUnbind();
+
+SAPI Image ImageCreate(i32 width, i32 height, Color color);
+SAPI Image ImageLoadFromMemory(u8* pixels, i32 width, i32 height);
+SAPI Image ImageLoadFromFile(const char* filePath);
+SAPI void ImageDelete(Image* image);
+// EndNote
 
 SAPI void ClearBackground(u8 r, u8 g, u8 b, u8 a);
 SAPI void ClearBackground(Color color);
