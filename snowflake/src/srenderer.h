@@ -92,7 +92,8 @@ SAPI void DrawRectanglePro(const RectangleShape* rect);
 SAPI void DrawRectangle(Vec2 pos, Vec2 size, f32 rotation, Color color);
 SAPI void DrawRectangle(f32 left, f32 top, f32 width, f32 height, f32 rotation, Color color);
 
-SAPI void DrawSprite(const Texture2D* texture, Rectanglei texRect, const Transform* transform, Color tint);
+void DrawSprite(const Texture2D* texture, Rectanglei texRect, f32 width, f32 height,
+                const Transform* transform, Color tint);
 SAPI void DrawSprite(const Sprite* sprite);
 
 SAPI void DrawTriangle(Vec2 v1, Vec2 v2, Vec2 v3, Color color);
