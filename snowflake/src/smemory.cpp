@@ -110,7 +110,9 @@ char* SMemUsage()
         "STRING     ",
         "APPLICATION",
         "TEXTURE    ",
+        "IMAGE      ",
         "RENDERER   ",
+        "FONT       ",
     };
 
     const u64 gib = 1024 * 1024 * 1024;
