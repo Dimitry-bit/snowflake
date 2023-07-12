@@ -16,6 +16,8 @@ static i32 ShaderGetUniformLocation(Shader* shader, const char* uniformName);
 RendererContext rContext = { };
 static bool isInit;
 
+static Texture2D defaultTexture = { };
+
 void GLClearError()
 {
     while (glGetError() != GL_NO_ERROR);
@@ -97,7 +99,7 @@ void RendererStartup(f32 width, f32 height)
     RendererCreateViewport(width, height);
 
     // Initialize default white texture
-    TextureDefault();
+    defaultTexture = TextureCreate(1, 1, WHITE);
 
     rContext.layout = VertexBufferLayoutInit();
     VertexBufferLayoutPushVec2(&rContext.layout, 1);
@@ -116,7 +118,7 @@ void RendererShutdown()
     VertexBufferLayoutDelete(&rContext.layout);
 
     // NOTE(Tony): Delete default shader
-    // NOTE(Tony): Delete default texture
+    TextureDelete(&defaultTexture);
 
     SMemSet(&rContext, 0, sizeof(RendererContext));
 
@@ -565,29 +567,27 @@ void ShaderSetMatrix4(Shader* shader, const char* uniformName, Mat4 mat)
     }
 }
 
-Texture2D TextureLoadFromFile(const char* filePath)
+Texture2D TextureCreate(i32 width, i32 height, Color color)
 {
-    i32 width = 0;
-    i32 height = 0;
-    i32 nrChannels = 0;
+    Texture2D defaultTex = { };
+    Image image = ImageCreate(width, height, color);
+    defaultTex = TextureLoadFromImage(&image);
+    ImageDelete(&image);
 
-    u8* data = SImageLoad(filePath, &width, &height, &nrChannels);
-    Texture2D texture = TextureLoadFromMemory(data, width, height);
-    SImageUnload(data);
-
-    return texture;
+    return defaultTex;
 }
 
-Texture2D TextureLoadFromMemory(u8* data, i32 width, i32 height)
+Texture2D TextureLoadFromMemory(u8* pixels, i32 width, i32 height)
 {
     Texture2D texture = { };
 
-    if (!data) {
+    if (!pixels) {
         return texture;
     }
 
     texture.width = width;
     texture.height = height;
+    texture.nrChannel = 4;
 
     GLCall(glGenTextures(1, &texture.rendererID));
     GLCall(glBindTexture(GL_TEXTURE_2D, texture.rendererID));
@@ -598,7 +598,8 @@ Texture2D TextureLoadFromMemory(u8* data, i32 width, i32 height)
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 
-    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texture.width, texture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data));
+    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texture.width, texture.height, 0,
+                        GL_RGBA, GL_UNSIGNED_BYTE, pixels));
     GLCall(glGenerateMipmap(GL_TEXTURE_2D));
 
     GLCall(glBindTexture(GL_TEXTURE_2D, 0));
@@ -606,16 +607,22 @@ Texture2D TextureLoadFromMemory(u8* data, i32 width, i32 height)
     return texture;
 }
 
-const Texture2D* TextureDefault()
+Texture2D TextureLoadFromFile(const char* filePath)
 {
-    static Texture2D defaultTex = { };
+    i32 width = 0;
+    i32 height = 0;
+    i32 nrChannels = 0;
 
-    if (defaultTex.rendererID == 0) {
-        unsigned char texData[] = { 255, 255, 255, 255 };
-        defaultTex = TextureLoadFromMemory(texData, 1, 1);
-    }
+    u8* pixels = SImageLoad(filePath, &width, &height, &nrChannels);
+    Texture2D texture = TextureLoadFromMemory(pixels, width, height);
+    SImageUnload(pixels);
 
-    return &defaultTex;
+    return texture;
+}
+
+Texture2D TextureLoadFromImage(const Image* image)
+{
+    return TextureLoadFromMemory(image->pixels, image->width, image->height);
 }
 
 void TextureDelete(Texture2D* texture)
@@ -623,7 +630,7 @@ void TextureDelete(Texture2D* texture)
     SASSERT(texture);
 
     GLCall(glDeleteTextures(1, &texture->rendererID));
-    SMemSet(texture, 0, sizeof(Texture2D));
+    SMemZero(texture, sizeof(Texture2D));
 }
 
 void TextureBind(const Texture2D* texture, i32 slot)
@@ -637,6 +644,72 @@ void TextureBind(const Texture2D* texture, i32 slot)
 void TextureUnbind()
 {
     GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+}
+
+Image ImageCreate(i32 width, i32 height, Color color)
+{
+    Image image = { };
+    image.nrChannel = 4;
+
+    if (width <= 0 || height <= 0) {
+        return image;
+    }
+
+    image.width = width;
+    image.height = height;
+
+    u64 sizeInBytes = width * height * 4 * sizeof(u8);
+    image.pixels = (u8*) SMalloc(sizeInBytes, MEMORY_TAG_IMAGE);
+
+    u32* pixels = (u32*) image.pixels;
+    for (i32 i = 0; i < width * height; i++) {
+        pixels[i] = (color.r << 0) | (color.g << 8) |
+                    (color.b << 16) | (color.a << 24);
+    }
+
+    return image;
+}
+
+Image ImageLoadFromMemory(u8* pixels, i32 width, i32 height)
+{
+    Image image = { };
+    image.nrChannel = 4;
+
+    if (width <= 0 || height <= 0) {
+        return image;
+    }
+
+    image.width = width;
+    image.height = height;
+
+    u64 sizeInBytes = width * height * 4 * sizeof(u8);
+    image.pixels = (u8*) SMalloc(sizeInBytes, MEMORY_TAG_IMAGE);
+    if (pixels) {
+        SMemCopy(image.pixels, pixels, sizeInBytes);
+    }
+
+    return image;
+}
+
+Image ImageLoadFromFile(const char* filePath)
+{
+    i32 width = 0;
+    i32 height = 0;
+    i32 nrChannels = 0;
+
+    u8* pixels = SImageLoad(filePath, &width, &height, &nrChannels);
+    Image image = ImageLoadFromMemory(pixels, width, height);
+    SImageUnload(pixels);
+
+    return image;
+}
+
+void ImageDelete(Image* image)
+{
+    SASSERT(image);
+
+    SFree(image->pixels);
+    SMemZero(image, sizeof(Image));
 }
 
 void RendererDraw(DrawMode mode, const VertexArray* va, const IndexBuffer* ib, const Texture2D* texture,
@@ -653,7 +726,7 @@ void RendererDraw(DrawMode mode, const VertexArray* va, const IndexBuffer* ib, c
     if (texture) {
         TextureBind(texture, 0);
     } else {
-        TextureBind(TextureDefault(), 0);
+        TextureBind(&defaultTexture, 0);
     }
 
     GLCall(glDrawElements(mode, ib->count, GL_UNSIGNED_INT, nullptr));
@@ -671,10 +744,31 @@ void RendererDraw(DrawMode mode, const VertexArray* va, u32 count, const Texture
     if (texture) {
         TextureBind(texture, 0);
     } else {
-        TextureBind(TextureDefault(), 0);
+        TextureBind(&defaultTexture, 0);
     }
 
     GLCall(glDrawArrays(mode, 0, count));
+}
+
+void RendererDraw(DrawMode mode, const VertexBuffer* vb, u32 count, const Texture2D* texture, Mat4 transformMatrix)
+{
+    SASSERT_MSG(isInit, "Renderer is not started")
+
+    VertexArray va = VertexArrayInit();
+    VertexArrayAddBuffer(&va, vb, &rContext.layout);
+
+    Mat4 mvp = rContext.projMatrix * rContext.viewMatrix * transformMatrix;
+    ShaderSetMatrix4(&rContext.boundShader, "uMvp", mvp);
+
+    if (texture) {
+        TextureBind(texture, 0);
+    } else {
+        TextureBind(&defaultTexture, 0);
+    }
+
+    GLCall(glDrawArrays(mode, 0, count));
+
+    VertexArrayDelete(&va);
 }
 
 void RendererDraw(DrawMode mode, const Vertex* vertices, u32 count, const Texture2D* texture, Mat4 transformMatrix)
@@ -694,7 +788,7 @@ void RendererDraw(DrawMode mode, const Vertex* vertices, u32 count, const Textur
     if (texture) {
         TextureBind(texture, 0);
     } else {
-        TextureBind(TextureDefault(), 0);
+        TextureBind(&defaultTexture, 0);
     }
 
     GLCall(glDrawArrays(mode, 0, count));
