@@ -6,7 +6,7 @@
 #include "smemory.h"
 #include "stext.h"
 
-static void TestWindow(i32 configFlags);
+static void TestWindow(u32 configFlags);
 static void TestMathFunctions();
 static void TestFileFunctions();
 static void TestInput();
@@ -15,13 +15,15 @@ static void TestTextureDrawing(const Texture2D* texture);
 
 int main()
 {
-    i32 configFlags = FLAG_WINDOW_RESIZEABLE | FLAG_CONTEXT_OPENGL_3 | FLAG_CONTEXT_OPENGL_CORE_PROFILE;
+    WindowConfig config = { };
+    config.flags = FLAG_WINDOW_RESIZEABLE | FLAG_CONTEXT_OPENGL_3 | FLAG_CONTEXT_OPENGL_CORE_PROFILE;
+    config.antialiasingLevel = 4;
 
-    if (!InitWindow("TestWindow", 800, 600, configFlags)) {
+    if (!InitWindow("TestWindow", 800, 600, config)) {
         return -1;
     }
 
-    TestWindow(configFlags);
+    TestWindow(config.flags);
     TestMathFunctions();
     TestFileFunctions();
 
@@ -65,7 +67,7 @@ int main()
     return 0;
 }
 
-static void TestWindow(i32 configFlags)
+static void TestWindow(u32 configFlags)
 {
     SASSERT(IsWindowState(configFlags) == true);
 
