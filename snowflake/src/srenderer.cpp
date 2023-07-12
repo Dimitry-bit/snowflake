@@ -61,7 +61,7 @@ void DrawCirclePro(f32 radius, i32 pointCount, const Transform* transform, Color
     i32 vertexCount = (pointCount + 2);
     i64 verticesSize = vertexCount * sizeof(Vertex);
     Vertex* vertices = (Vertex*) SAlloca(verticesSize);
-    SMemSet(vertices, 0, verticesSize);
+    SMemZero(vertices, verticesSize);
 
     vertices[0].position.x = 0;
     vertices[0].position.y = 0;
@@ -118,7 +118,7 @@ void DrawEllipsePro(f32 radiusH, f32 radiusV, i32 pointCount, const Transform* t
     i32 vertexCount = (pointCount + 2);
     i64 verticesSize = vertexCount * sizeof(Vertex);
     Vertex* vertices = (Vertex*) SAlloca(verticesSize);
-    SMemSet(vertices, 0, verticesSize);
+    SMemZero(vertices, verticesSize);
 
     vertices[0].position.x = 0;
     vertices[0].position.y = 0;
@@ -174,7 +174,7 @@ void DrawRingPro(f32 innerRadius, f32 outerRadius, i32 quadCount, const Transfor
 
     i64 verticesSize = 6 * quadCount * sizeof(Vertex);
     Vertex* vertices = (Vertex*) SAlloca(verticesSize);
-    SMemSet(vertices, 0, verticesSize);
+    SMemZero(vertices, verticesSize);
 
     if (outerRadius < innerRadius) {
         f32 tmp = outerRadius;

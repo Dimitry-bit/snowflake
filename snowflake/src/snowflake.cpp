@@ -148,8 +148,8 @@ void CloseWindow()
 
     mouseWheelMovement = Vector2Zero();
 
-    SMemSet(&time, 0, sizeof(time));
-    SMemSet(&fps, 0, sizeof(FPS));
+    SMemZero(&time, sizeof(time));
+    SMemZero(&fps, sizeof(FPS));
 
     MemoryShutdown();
     LOG_INFO("Snowflake window closed successfully");

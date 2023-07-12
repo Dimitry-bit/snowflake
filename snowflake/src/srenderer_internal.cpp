@@ -120,7 +120,7 @@ void RendererShutdown()
     // NOTE(Tony): Delete default shader
     TextureDelete(&defaultTexture);
 
-    SMemSet(&rContext, 0, sizeof(RendererContext));
+    SMemZero(&rContext, sizeof(RendererContext));
 
     LOG_INFO("Renderer Shutdown");
 }
@@ -163,7 +163,7 @@ void VertexBufferDelete(VertexBuffer* vb)
 
     GLCall(glDeleteBuffers(1, &vb->rendererID));
 
-    SMemSet(vb, 0, sizeof(VertexBuffer));
+    SMemZero(vb, sizeof(VertexBuffer));
 }
 
 void VertexBufferBind(const VertexBuffer* vb)
@@ -195,7 +195,7 @@ void IndexBufferDelete(IndexBuffer* ib)
 
     GLCall(glDeleteBuffers(1, &ib->rendererID));
 
-    SMemSet(ib, 0, sizeof(IndexBuffer));
+    SMemZero(ib, sizeof(IndexBuffer));
 }
 
 void IndexBufferBind(const IndexBuffer* ib)
@@ -222,7 +222,7 @@ void VertexArrayDelete(VertexArray* va)
     SASSERT_MSG(va, "VertexArray can't be null");
     GLCall(glDeleteVertexArrays(1, &va->rendererID));
 
-    SMemSet(va, 0, sizeof(VertexArray));
+    SMemZero(va, sizeof(VertexArray));
 }
 
 void VertexArrayAddBuffer(const VertexArray* va, const VertexBuffer* vb, const VertexBufferLayout* layout)
@@ -386,7 +386,7 @@ void ShaderDelete(Shader* shader)
     GLCall(glDeleteProgram(shader->rendererID));
 
     LOG_TRACE("Shader(ID:%d): Deleted successfully", shader->rendererID);
-    SMemSet(shader, 0, sizeof(Shader));
+    SMemZero(shader, sizeof(Shader));
 }
 
 static i32 ShaderGetUniformLocation(Shader* shader, const char* uniformName)
