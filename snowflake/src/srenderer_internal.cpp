@@ -708,7 +708,9 @@ void ImageDelete(Image* image)
 {
     SASSERT(image);
 
-    SFree(image->pixels);
+    if (image->pixels) {
+        SFree(image->pixels);
+    }
     SMemZero(image, sizeof(Image));
 }
 
