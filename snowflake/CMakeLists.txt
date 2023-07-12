@@ -8,7 +8,7 @@ set_target_properties(snowflake PROPERTIES
         DEBUG_POSTFIX "-d"
         CXX_VISIBILITY_PRESET hidden
         VISIBILITY_INLINES_HIDDEN YES)
-target_link_libraries(snowflake PUBLIC ${OPENGL_LIBRARY} glfw glew32s)
+target_link_libraries(snowflake PUBLIC ${OPENGL_LIBRARY} glfw glew32s freetype)
 target_include_directories(snowflake PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 target_compile_options(snowflake PRIVATE

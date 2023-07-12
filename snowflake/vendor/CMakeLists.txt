@@ -34,3 +34,13 @@ if (NOT glew_FOUND)
     target_link_libraries(glew32s PRIVATE ${OPENGL_LIBRARY} ${EXTRA_LIBS})
     target_include_directories(glew32s PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/GLEW/include)
 endif ()
+
+if (NOT freetype_FOUND)
+    FetchContent_Declare(
+            freetype
+            GIT_REPOSITORY "https://github.com/freetype/freetype.git"
+            GIT_TAG "master"
+            SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/freetype
+    )
+    FetchContent_MakeAvailable(freetype)
+endif ()
