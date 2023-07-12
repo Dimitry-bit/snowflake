@@ -3,7 +3,7 @@
 #include "snowflake.h"
 #include "srenderer.h"
 
-struct Glyph {
+struct SAPI Glyph {
     u32 width;
     u32 height;
     i32 bearingX;
@@ -12,7 +12,7 @@ struct Glyph {
     Image bitmap;
 };
 
-struct Font {
+struct SAPI Font {
     u32 baseSize;
     i32 glyphCount;
     Glyph* glyphTable;
@@ -20,7 +20,7 @@ struct Font {
     Rectanglei* texRects;
 };
 
-struct Text {
+struct SAPI Text {
     const Font* font;
     char* string;
     u32 characterSize;
