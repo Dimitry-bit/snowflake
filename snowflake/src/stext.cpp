@@ -55,6 +55,7 @@ void FontDelete(Font* font)
 
     SFree(font->glyphTable);
     SFree(font->texRects);
+    SMemZero(font, sizeof(Font));
 }
 
 static Texture2D FontGenerateFontAtlas(Glyph* glyphs, Rectanglei** texRects, i32 glyphCount, u32 baseFontSize)
