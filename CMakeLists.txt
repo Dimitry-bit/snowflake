@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 3.25)
-project(snowflake_testbed)
-
+project(snowflake)
 set(CMAKE_CXX_STANDARD 17)
 
 # Setup build directory
 math(EXPR platform_bits "${CMAKE_SIZEOF_VOID_P} * 8")
-set(project_platform_binary_dir ${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}/$<CONFIG>-x${platform_bits})
+set(project_platform_binary_dir ${CMAKE_SOURCE_DIR}/bin/${PROJECT_NAME}_testbed/$<CONFIG>-x${platform_bits})
 # Set .dll/.exe files directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${project_platform_binary_dir})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${project_platform_binary_dir})
@@ -15,11 +14,8 @@ set(CMAKE_BUILD_FILES_DIRECTORY ${CMAKE_SOURCE_DIR}/intermediate/${PROJECT_NAME}
 set(CMAKE_BUILD_DIRECTORY ${CMAKE_SOURCE_DIR}/intermediate/${PROJECT_NAME}/$<CONFIG>-x${platform_bits})
 set(CMAKE_CACHEFILE_DIR ${CMAKE_SOURCE_DIR}/intermediate/${PROJECT_NAME}/$<CONFIG>-x${platform_bits})
 
-# Search for .cpp files
 file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/src)
-file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/src/*.cpp)
+file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}_testbed/src)
 
-add_executable(${PROJECT_NAME} ${SRC_FILES})
-target_link_libraries(${PROJECT_NAME} PRIVATE snowflake)
-
-add_subdirectory(Snowflake)
+add_subdirectory(snowflake)
+add_subdirectory(snowflake_testbed)
