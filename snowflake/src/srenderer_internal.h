@@ -3,6 +3,7 @@
 #include "defines.h"
 #include "smath.h"
 #include "srenderer.h"
+#include "texture.h"
 
 #include <GL/glew.h>
 

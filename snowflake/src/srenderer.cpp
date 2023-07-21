@@ -473,16 +473,3 @@ void SpriteSetTexture(Sprite* sprite, const SubTexture2D* subTexture)
     sprite->texture = subTexture->texture;
     sprite->textureRect = subTexture->rect;
 }
-
-SubTexture2D SubTexture2DCreate(const Texture2D* texture, Vec2 pos, Vec2 cellSize, Vec2 spriteSize)
-{
-    SubTexture2D result = { };
-    result.texture = texture;
-
-    result.rect.left = pos.x * cellSize.x;
-    result.rect.top = pos.y * cellSize.y;
-    result.rect.width = cellSize.x * spriteSize.x;
-    result.rect.height = cellSize.y * spriteSize.y;
-
-    return result;
-}
