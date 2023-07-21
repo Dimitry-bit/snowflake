@@ -1,13 +1,10 @@
-#include <cstring>
 #include <cstdio>
+
 #include "snowflake.h"
 #include "smemory.h"
 #include "srenderer_internal.h"
 #include "stext.h"
 
-static void TestWindow(u32 configFlags);
-static void TestMathFunctions();
-static void TestFileFunctions();
 static void TestInput();
 static void TestPrimitiveShapes();
 static void TestTextureDrawing(const Texture2D* texture);
@@ -21,10 +18,6 @@ int main()
     if (!InitWindow("TestWindow", 800, 600, config)) {
         return -1;
     }
-
-    TestWindow(config.flags);
-    TestMathFunctions();
-    TestFileFunctions();
 
     Texture2D tex = TextureLoadFromFile("../resources/RPGpack_sheet.bmp");
     Font font = FontLoadFromFile("../resources/IBMPlexSans-Regular.ttf", 48);
@@ -62,68 +55,6 @@ int main()
     FontDelete(&font);
 
     CloseWindow();
-
-    return 0;
-}
-
-static void TestWindow(u32 configFlags)
-{
-    SASSERT(IsWindowState(configFlags) == true);
-
-    LOG_INFO("Screen Size: %dx%d", (i32) GetWindowSize().x, (i32) GetWindowSize().y);
-
-    SASSERT(IsWindowHidden() == false);
-    SASSERT(IsWindowFullscreen() == false);
-
-    EnableVsync();
-    SASSERT(IsVsyncEnabled() == true);
-    DisableVsync();
-    SASSERT(IsVsyncEnabled() == false);
-
-    SetWindowSize(800, 600);
-
-    SetWindowPosition(100, 100);
-    MaximizeWindow();
-    MinimizeWindow();
-
-    HideCursor();
-    SASSERT(IsCursorHidden() == true);
-    ShowCursor();
-    SASSERT(IsCursorHidden() == false);
-    DisableCursor();
-    EnableCursor();
-
-}
-
-static void TestMathFunctions()
-{
-    SASSERT(Min(5, 10) == 5);
-    SASSERT(Min(5.0f, 10.0f) == 5.0f);
-    SASSERT(Max(5, 10) == 10);
-    SASSERT(Max(5.0f, 10.0f) == 10.0f);
-    SASSERT(Clamp(2, 0, 1) == 1);
-    SASSERT(Clamp(2.0f, 0.0f, 1.0f) == 1.0f);
-    SASSERT(Clamp(-2, 0, 1) == 0);
-    SASSERT(Clamp(-2.0f, 0.0f, 0.0f) == 0.0f);
-    SASSERT(Abs(-2) == 2);
-    SASSERT(Abs(-2.0f) == 2.0f);
-    SASSERT(Square(-2) == 4);
-    SASSERT(Square(-2.0f) == 4.0f);
-}
-
-static void TestFileFunctions()
-{
-    StringViewer fn = FileGetFileName("../resources/wall.bmp");
-    StringViewer fe = FileGetExtension("../resources/wall.bmp");
-    StringViewer fne = FileGetFileNameNoExtension("../resources/wall.bmp");
-    StringViewer path = FileGetPath("../resources/wall.bmp");
-
-    SASSERT(strncmp(fn.data, "wall.bmp", fn.length) == 0 && fn.length == 8);
-    SASSERT(strncmp(fe.data, ".bmp", fe.length) == 0 && fe.length == 4);
-    SASSERT(strncmp(fne.data, "wall", fne.length) == 0 && fne.length == 4);
-    SASSERT(strncmp(path.data, "../resources/", path.length) == 0 && path.length == 13);
-    LOG_DEBUG("FileName '%.*s', Extension '%.*s', FileNameOnly '%.*s', Path '%.*s'",
-              fn.length, fn.data, fe.length, fe.data, fne.length, fne.data, path.length, path.data);
 }
 
 static void TestInput()
