@@ -1,8 +1,8 @@
 #include "srenderer_internal.h"
-#include "logger.h"
-#include "sassert.h"
-#include "smemory.h"
-#include "utils.h"
+#include "core/logger.h"
+#include "core/sassert.h"
+#include "core/smemory.h"
+#include "utils/utils.h"
 
 #include <GL/glew.h>
 #include <cstdio>

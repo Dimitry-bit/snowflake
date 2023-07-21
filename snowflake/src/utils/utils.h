@@ -1,7 +1,6 @@
 #pragma once
 
-#include "defines.h"
-#include "utils.h"
+#include "core/defines.h"
 
 struct SAPI StringViewer {
     const char* data;

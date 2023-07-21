@@ -1,8 +1,8 @@
 #include "swindow.h"
 #include "logger.h"
+#include "renderer/srenderer_internal.h"
 #include "sassert.h"
 #include "smemory.h"
-#include "srenderer_internal.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

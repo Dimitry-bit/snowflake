@@ -1,7 +1,7 @@
 #include "texture.h"
-#include "sassert.h"
+#include "core/sassert.h"
+#include "core/smemory.h"
 #include "simage_loader.h"
-#include "smemory.h"
 #include "srenderer_internal.h"
 
 #include <GL/glew.h>

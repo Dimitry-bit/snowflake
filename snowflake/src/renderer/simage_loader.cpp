@@ -1,7 +1,7 @@
 #include "simage_loader.h"
-#include "sassert.h"
-#include "smemory.h"
-#include "utils.h"
+#include "core/sassert.h"
+#include "core/smemory.h"
+#include "utils/utils.h"
 
 #ifdef __GNUC__
 #define PACK(__Declaration__) __Declaration__ __attribute__((__packed__))

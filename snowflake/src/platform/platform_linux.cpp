@@ -1,5 +1,5 @@
 #include "platform.h"
-#include "defines.h"
+#include "core/defines.h"
 
 #if SPLATFORM_LINUX
 

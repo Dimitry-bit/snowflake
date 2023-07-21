@@ -1,8 +1,8 @@
 #pragma once
 
 #include "color.h"
-#include "defines.h"
-#include "smath.h"
+#include "core/defines.h"
+#include "math/smath.h"
 #include "texture.h"
 
 struct SAPI Vertex {

@@ -1,11 +1,12 @@
 #pragma once
 
-#include "color.h"
-#include "defines.h"
-#include "logger.h"
-#include "sassert.h"
-#include "smath.h"
-#include "utils.h"
+#include "core/defines.h"
+#include "core/logger.h"
+#include "core/sassert.h"
+#include "math/smath.h"
+#include "renderer/color.h"
+#include "utils/utils.h"
 
-#include "srenderer.h"
-#include "swindow.h"
+#include "core/swindow.h"
+#include "renderer/srenderer.h"
+#include "renderer/stext.h"

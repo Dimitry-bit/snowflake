@@ -1,7 +1,7 @@
 #pragma once
 
 #include "color.h"
-#include "defines.h"
+#include "core/defines.h"
 
 struct SAPI Texture2D {
     u32 rendererID;

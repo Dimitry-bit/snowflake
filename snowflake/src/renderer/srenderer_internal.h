@@ -1,7 +1,7 @@
 #pragma once
 
-#include "defines.h"
-#include "smath.h"
+#include "core/defines.h"
+#include "math/smath.h"
 #include "srenderer.h"
 #include "texture.h"
 

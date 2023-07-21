@@ -1,8 +1,6 @@
-#include "smemory.h"
+#include "core/smemory.h"
+#include "renderer/srenderer_internal.h"
 #include "snowflake.h"
-#include "srenderer.h"
-#include "srenderer_internal.h"
-#include "stext.h"
 
 #include <cstdio>
 

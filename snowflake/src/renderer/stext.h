@@ -1,9 +1,9 @@
 #pragma once
 
 #include "color.h"
-#include "defines.h"
+#include "core/defines.h"
 #include "srenderer.h"
-#include "utils.h"
+#include "utils/utils.h"
 
 struct SAPI Glyph {
     u32 width;

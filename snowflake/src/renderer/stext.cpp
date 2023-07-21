@@ -1,7 +1,7 @@
 #include "stext.h"
-#include "logger.h"
-#include "sassert.h"
-#include "smemory.h"
+#include "core/logger.h"
+#include "core/sassert.h"
+#include "core/smemory.h"
 #include "srenderer_internal.h"
 
 #include <ft2build.h>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "defines.h"
-#include "smath.h"
+#include "math/smath.h"
 
 enum SAPI KeyboardKey {
 /* Printable keys */
