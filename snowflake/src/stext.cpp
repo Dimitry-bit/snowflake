@@ -232,10 +232,8 @@ void TextSetString(Text* text, const char* string)
 {
     SASSERT(text);
 
-    if (text->string) {
-        SFree(text->string);
-        text->string = nullptr;
-    }
+    SFree(text->string);
+    text->string = nullptr;
 
     if (!string) {
         return;
@@ -252,10 +250,8 @@ void TextSetString(Text* text, const StringViewer* stringViewer)
     SASSERT(text);
     SASSERT(stringViewer);
 
-    if (text->string) {
-        SFree(text->string);
-        text->string = nullptr;
-    }
+    SFree(text->string);
+    text->string = nullptr;
 
     if (!stringViewer->data || stringViewer->length <= 0) {
         return;
