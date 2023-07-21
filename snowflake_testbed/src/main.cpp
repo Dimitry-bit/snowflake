@@ -1,9 +1,10 @@
-#include <cstdio>
-
-#include "snowflake.h"
 #include "smemory.h"
+#include "snowflake.h"
+#include "srenderer.h"
 #include "srenderer_internal.h"
 #include "stext.h"
+
+#include <cstdio>
 
 static void TestInput();
 static void TestPrimitiveShapes();

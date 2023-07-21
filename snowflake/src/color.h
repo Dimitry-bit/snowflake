@@ -1,6 +1,7 @@
 #pragma once
 
-#include "snowflake.h"
+#include "defines.h"
+#include "smath.h"
 
 union SAPI Color {
     u8 e[4];

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "snowflake.h"
+#include "defines.h"
+#include "smath.h"
 
 enum SAPI KeyboardKey {
 /* Printable keys */

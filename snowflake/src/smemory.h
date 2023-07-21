@@ -1,6 +1,6 @@
 #pragma once
 
-#include "snowflake.h"
+#include "defines.h"
 
 #define SAlloca(size) alloca(size)
 

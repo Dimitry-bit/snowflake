@@ -1,9 +1,11 @@
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
-
-#include "snowflake.h"
-#include "srenderer_internal.h"
+#include "swindow.h"
+#include "logger.h"
+#include "sassert.h"
 #include "smemory.h"
+#include "srenderer_internal.h"
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 #define ERROR_STR_WINDOW_INIT "Window is not initialized, Invoke InitWindow()"
 #define MAX_KEYBOARD_KEYS 512

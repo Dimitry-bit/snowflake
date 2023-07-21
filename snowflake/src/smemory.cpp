@@ -1,9 +1,11 @@
-#include <cstdio>
-#include <cstring>
-#include <memory>
-#include <unordered_map>
-
 #include "smemory.h"
+#include "logger.h"
+#include "sassert.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <unordered_map>
 
 struct AllocMetaData {
     u32 size;
@@ -59,10 +61,38 @@ void* SMalloc(u32 size, MemoryTags tag)
     memset(block, 0, size);
 
 #ifdef SNOWFLAKE_MEM_DEBUG
-    memContext.allocTable[block] = AllocMetaData{ size, tag };
+    memContext.allocTable.emplace(block, AllocMetaData{ size, tag });
 #endif
 
     return block;
+}
+
+void* SRealloc(void* block, u32 size, MemoryTags tag)
+{
+    void* newBlk = realloc(block, size);
+
+#ifdef SNOWFLAKE_MEM_DEBUG
+    if (newBlk) {
+        if (memContext.allocTable.count(block)) {
+            AllocMetaData old = memContext.allocTable.at(block);
+            memContext.totalAllocated -= old.size;
+            memContext.taggedAllocations[old.tag] -= old.size;
+            memContext.allocTable.erase(block);
+
+            memContext.totalAllocated += size;
+            memContext.taggedAllocations[old.tag] += size;
+            memContext.allocTable.emplace(newBlk, AllocMetaData{ size, old.tag });
+        } else {
+            memContext.totalAllocated += size;
+            memContext.taggedAllocations[tag] += size;
+            memContext.allocTable.emplace(newBlk, AllocMetaData{ size, tag });
+        }
+    } else {
+        LOG_ERROR("SRealloc '%p' failed to allocate block", block);
+    }
+#endif
+
+    return newBlk;
 }
 
 void SFree(void* block)
@@ -74,7 +104,7 @@ void SFree(void* block)
 
         memContext.totalAllocated -= metaData.size;
         memContext.taggedAllocations[metaData.tag] -= metaData.size;
-    } else {
+    } else if (block) {
         LOG_WARN("SFree '%p' allocation is not recorded in AllocTable", block);
     }
 #endif

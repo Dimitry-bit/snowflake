@@ -1,8 +1,9 @@
-#include "GL/glew.h"
-
 #include "srenderer.h"
-#include "srenderer_internal.h"
+#include "sassert.h"
 #include "smemory.h"
+#include "srenderer_internal.h"
+
+#include <GL/glew.h>
 
 void ClearBackground(u8 r, u8 g, u8 b, u8 a)
 {

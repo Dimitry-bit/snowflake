@@ -1,7 +1,10 @@
 #pragma once
 
-#include "snowflake.h"
-#include "GL/glew.h"
+#include "defines.h"
+#include "smath.h"
+#include "srenderer.h"
+
+#include <GL/glew.h>
 
 #ifndef GLCall
 #define GLCall(x)                                                  \

@@ -1,5 +1,8 @@
 #pragma once
 
+#include "defines.h"
+#include "utils.h"
+
 struct SAPI StringViewer {
     const char* data;
     u32 length;

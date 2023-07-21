@@ -1,6 +1,8 @@
 #pragma once
 
-#include "snowflake.h"
+#include "color.h"
+#include "defines.h"
+#include "smath.h"
 
 struct SAPI Vertex {
     Vec2 position;

@@ -3,7 +3,7 @@
 
 #if SPLATFORM_WINDOWS
 
-#include "windows.h"
+#include <windows.h>
 
 void PlatformConsoleWrite(const char* message, u8 color)
 {

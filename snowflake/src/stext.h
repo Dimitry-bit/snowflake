@@ -1,7 +1,9 @@
 #pragma once
 
-#include "snowflake.h"
+#include "color.h"
+#include "defines.h"
 #include "srenderer.h"
+#include "utils.h"
 
 struct SAPI Glyph {
     u32 width;

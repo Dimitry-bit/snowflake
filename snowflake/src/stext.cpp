@@ -1,9 +1,11 @@
-#include "ft2build.h"
-#include FT_FREETYPE_H
-
 #include "stext.h"
+#include "logger.h"
+#include "sassert.h"
 #include "smemory.h"
 #include "srenderer_internal.h"
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 static Texture2D FontGenerateFontAtlas(Glyph* glyphs, Rectanglei** texRects, i32 glyphCount, u32 baseFontSize);
 static Glyph FontGetGlyph(FT_Face face, u8 glyphID);
