@@ -131,7 +131,6 @@ void SMemMove(void* dst, const void* src, u32 size)
 {
     memmove(dst, src, size);
 }
-
 char* SMemUsage()
 {
     static const char* memoryTagStr[MEMORY_TAG_MAX_TAGS] = {

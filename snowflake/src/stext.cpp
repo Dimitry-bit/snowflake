@@ -91,8 +91,7 @@ static Texture2D FontGenerateFontAtlas(Glyph* glyphs, Rectanglei** texRects, i32
     GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texture.width, texture.height,
                         0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr));
 
-    // TODO(Tony): Wrap realloc calls
-    (*texRects) = (Rectanglei*) realloc(*texRects, glyphCount * sizeof(Rectanglei));
+    (*texRects) = (Rectanglei*) SRealloc(*texRects, glyphCount * sizeof(Rectanglei), MEMORY_TAG_FONT);
 
     i32 xOffset = 0;
     i32 yOffset = 0;

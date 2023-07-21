@@ -21,6 +21,7 @@ SAPI void MemoryStartup();
 SAPI void MemoryShutdown();
 
 SAPI void* SMalloc(u32 size, MemoryTags tag);
+SAPI void* SRealloc(void* block, u32 size, MemoryTags tag = MEMORY_TAG_UNKNOWN);
 SAPI void SFree(void* block);
 SAPI void SMemZero(void* block, u32 size);
 SAPI void SMemSet(void* dst, i32 value, u32 size);
