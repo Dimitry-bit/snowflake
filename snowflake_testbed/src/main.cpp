@@ -94,9 +94,9 @@ static void TestPrimitiveShapes()
         for (i32 j = 0; j < countY; ++j) {
             f32 posX = padding + i * (width + padding);
             f32 posY = padding + j * (height + padding);
-            RectangleShape rect = RectangleCreate(posX, posY, width, height, ANGLEBLUE);
-            rect.transform.rotation = Sin((f32) GetTime());
-            rect.transform.origin = Vec2{ 0.5f * rect.width, 0.5f * rect.height };
+            RectangleShape rect = RectangleCreate(Vec2{ posX, posY }, Vec2{ width, height }, ANGLEBLUE);
+            rect.transform.rotation = Vec3{ 0.0f, 0.0f, Sin((f32) GetTime()) };
+            rect.transform.origin = Vec3{ 0.5f * rect.width, 0.5f * rect.height, 0.0f };
             DrawRectanglePro(&rect);
         }
     }
@@ -108,17 +108,17 @@ static void TestPrimitiveShapes()
     Vec2 v2 = { scrWidth / 2.0f - 100.0f, scrHeight / 2.0f + 100.0f };
     Vec2 v3 = { scrWidth / 2.0f + 100.0f, scrHeight / 2.0f + 100.0f };
 
-    DrawPixel(scrWidth - 100.0f, 50.0f, WHITE);
-    DrawPixel(scrWidth - 150.0f, 50.0f, WHITE);
-    DrawLine(500.0f, 50.0f, 600.0f, 50.0f, 1.0f, DEEPMAGENTA);
+    DrawPixel(Vec2{ scrWidth - 100.0f, 50.0f }, WHITE);
+    DrawPixel(Vec2{ scrWidth - 150.0f, 50.0f }, WHITE);
+    DrawLine(Vec2{ 500.0f, 50.0f }, Vec2{ 600.0f, 50.0f }, 1.0f, DEEPMAGENTA);
 
-    CircleShape circle = CircleCreate(0.0f, 0.0f, 40.0f, GLOSSYCYAN);
+    CircleShape circle = CircleCreate(Vec2{ 0.0f, 0.0f }, 40.0f, GLOSSYCYAN);
     DrawCirclePro(&circle);
 
-    EllipseShape ellipse = EllipseCreate(100.0f, 0.0f, 20.0f, 40.0f, GOLD);
+    EllipseShape ellipse = EllipseCreate(Vec2{ 100.0f, 0.0f }, 40.0f, 20.0f, GOLD);
     DrawEllipsePro(&ellipse);
 
-    RingShape ring = RingCreate(200.0f, 0.0f, 35.0f, 40.0f, COSMICPINK);
+    RingShape ring = RingCreate(Vec2{ 200.0f, 0.0f }, 35.0f, 40.0f, COSMICPINK);
     DrawRingPro(&ring);
 
     DrawTriangle(v1, v2, v3, CANDYPURPLE);
@@ -137,7 +137,7 @@ static void TestTextureDrawing(const Texture2D* texture)
         "WWWWWWWWWWWWWWWWWWW"
     };
 
-    SubTexture2D barrel = SubTexture2DCreate(texture, Vec2{ 6, 12 }, Vec2{ 64, 64 }, Vector2One());
+    SubTexture2D barrel = SubTexture2DCreate(texture, Vec2{ 8, 11 }, Vec2{ 64, 64 }, Vector2One());
     SubTexture2D tree = SubTexture2DCreate(texture, Vec2{ 0, 10 }, Vec2{ 64, 64 }, Vec2{ 1, 2 });
     SubTexture2D ground = SubTexture2DCreate(texture, Vec2{ 1, 1 }, Vec2{ 64, 64 }, Vector2One());
     SubTexture2D water = SubTexture2DCreate(texture, Vec2{ 11, 1 }, Vec2{ 64, 64 }, Vector2One());
@@ -145,38 +145,33 @@ static void TestTextureDrawing(const Texture2D* texture)
     const i32 mapWidth = 19;
     const i32 mapHeight = 7;
 
-    f32 width = (f32) GetWindowWidth() / mapWidth;
-    f32 height = (f32) GetWindowHeight() / mapHeight;
-
-    width = Clamp(width, 0.0f, Min(width, height));
-    height = Clamp(height, 0.0f, Min(width, height));
+    f32 width = (f32) ground.rect.width;
+    f32 height = (f32) ground.rect.height;
 
     for (i32 y = 0; y < mapHeight; y++) {
         for (i32 x = 0; x < mapWidth; x++) {
-            Sprite tile = SpriteCreate(Vec2{ x * width, y * height }, Vec2{ width, height });
+            Sprite tile = SpriteCreate(Vec2{ x * width, y * height }, nullptr);
             char tileID = map[x + y * mapWidth];
             if (tileID == 'W') {
-                SpriteSetTexture(&tile, &water);
-                DrawSprite(&tile);
+                SpriteSetTexture(&tile, &water, true);
+                DrawSpritePro(&tile);
             } else {
-                SpriteSetTexture(&tile, &ground);
-                DrawSprite(&tile);
+                SpriteSetTexture(&tile, &ground, true);
+                DrawSpritePro(&tile);
             }
         }
     }
 
     for (i32 y = 0; y < mapHeight; y++) {
         for (i32 x = 0; x < mapWidth; x++) {
-            Sprite tile = SpriteCreate(Vec2{ x * width, y * height }, Vec2{ width, height });
+            Sprite tile = SpriteCreate(Vec2{ x * width, y * height }, nullptr);
             char tileID = map[x + y * mapWidth];
             if (tileID == 'T') {
-                tile.height = width * 2.0f;
-                SpriteSetTexture(&tile, &tree);
-                DrawSprite(&tile);
+                SpriteSetTexture(&tile, &tree, true);
+                DrawSpritePro(&tile);
             } else if (tileID == 'B') {
-                tile.height = width;
-                SpriteSetTexture(&tile, &barrel);
-                DrawSprite(&tile);
+                SpriteSetTexture(&tile, &barrel, true);
+                DrawSpritePro(&tile);
             }
         }
     }

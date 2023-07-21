@@ -8,5 +8,6 @@
 #include "utils/utils.h"
 
 #include "core/swindow.h"
+#include "renderer/shapes.h"
 #include "renderer/srenderer.h"
 #include "renderer/stext.h"
