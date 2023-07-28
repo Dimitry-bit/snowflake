@@ -14,7 +14,9 @@
         SASSERT(GLLogCall(#x))
 #endif
 
-enum SAPI DrawMode {
+typedef i32 DrawMode;
+
+enum SAPI DrawModes {
     POINTS = GL_POINTS,
     LINE_STRIP = GL_LINE_STRIP,
     LINE_LOOP = GL_LINE_LOOP,
@@ -57,15 +59,6 @@ struct SAPI Shader {
     char* fsFilePath;
 };
 
-struct RendererContext {
-    Mat4 projMatrix;
-    Mat4 viewMatrix;
-    Shader boundShader;
-    VertexBufferLayout layout;
-};
-
-extern RendererContext rContext;
-
 void GLClearError();
 bool8 GLLogCall(const char* function);
 
@@ -99,9 +92,12 @@ SAPI void VertexBufferLayoutPushUByte(VertexBufferLayout* layout, u32 count);
 SAPI void VertexBufferLayoutPushVec2(VertexBufferLayout* layout, u32 count);
 
 SAPI Shader ShaderLoadFromFiles(const char* vsFilePath, const char* fsFilePath);
+SAPI Shader ShaderLoadFromMemory(const char* vsShader, const char* fsShader);
+SAPI Shader ShaderLoadDefault();
 SAPI void ShaderUnload(Shader* shader);
 SAPI void ShaderBind(Shader shader);
 SAPI void ShaderUnbind();
+SAPI Shader* ShaderGetBound();
 SAPI void ShaderSetUniform1f(Shader shader, const char* uniformName, f32 v);
 SAPI void ShaderSetUniform2f(Shader shader, const char* uniformName, f32 v0, f32 v1);
 SAPI void ShaderSetUniform2f(Shader shader, const char* uniformName, Vec2 v);

@@ -26,7 +26,7 @@ void DrawPixel(Vec2 pos, Color color)
     Vertex vertices[] = { { pos, Vector2Zero() } };
 
     Vec4 colorNormalized = ColorNormalize(color);
-    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(*ShaderGetBound(), "uColor", colorNormalized);
 
     Texture2D texture = TextureCreate(1, 1, WHITE);
 
@@ -43,7 +43,7 @@ void DrawLine(Vec2 startPos, Vec2 endPos, f32 width, Color color)
     };
 
     Vec4 colorNormalized = ColorNormalize(color);
-    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(*ShaderGetBound(), "uColor", colorNormalized);
 
     GLCall(glLineWidth(width));
 
@@ -63,7 +63,7 @@ void DrawTriangle(Vec2 v1, Vec2 v2, Vec2 v3, Color color)
     };
 
     Vec4 colorNormalized = ColorNormalize(color);
-    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(*ShaderGetBound(), "uColor", colorNormalized);
 
     Texture2D texture = TextureCreate(1, 1, WHITE);
 
@@ -89,7 +89,7 @@ void DrawCirclePro(Mat4 transformMatrix, i32 pointCount, Color color)
     }
 
     Vec4 colorNormalized = ColorNormalize(color);
-    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(*ShaderGetBound(), "uColor", colorNormalized);
 
     Texture2D texture = TextureCreate(1, 1, WHITE);
 
@@ -130,7 +130,7 @@ void DrawEllipsePro(Mat4 transformMatrix, i32 pointCount, Color color)
     }
 
     Vec4 colorNormalized = ColorNormalize(color);
-    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(*ShaderGetBound(), "uColor", colorNormalized);
 
     Texture2D texture = TextureCreate(1, 1, WHITE);
 
@@ -195,7 +195,7 @@ void DrawRingPro(Mat4 transformMatrix, f32 innerRadius, f32 outerRadius, i32 qua
     }
 
     Vec4 colorNormalized = ColorNormalize(color);
-    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(*ShaderGetBound(), "uColor", colorNormalized);
 
     Texture2D texture = TextureCreate(1, 1, WHITE);
 
@@ -231,7 +231,7 @@ void DrawRectanglePro(Mat4 transformMatrix, Color color)
     };
 
     Vec4 colorNormalized = ColorNormalize(color);
-    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(*ShaderGetBound(), "uColor", colorNormalized);
 
     Texture2D texture = TextureCreate(1, 1, WHITE);
 
@@ -274,7 +274,7 @@ void DrawSpritePro(Texture2D texture, Rectanglei texRect, Mat4 transformMatrix, 
     };
 
     Vec4 colorNormalized = ColorNormalize(tint);
-    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(*ShaderGetBound(), "uColor", colorNormalized);
 
     RendererDraw(TRIANGLES, vertices, 6, texture, transformMatrix);
 }

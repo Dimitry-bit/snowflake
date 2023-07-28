@@ -8,13 +8,21 @@
 #include <cstdio>
 #include <cstring>
 
+struct RendererContext {
+    Mat4 projMatrix;
+    Mat4 viewMatrix;
+    Shader boundShader;
+    VertexBufferLayout layout;
+};
+
 static u32 GLGetSizeofType(u32 type);
 
-static u32 ShaderCreate(char* vertexShader, char* fragmentShader);
-static u32 ShaderCompile(u32 type, char* source);
+static u32 ShaderCreate(const char* vertexShader, const char* fragmentShader);
+static u32 ShaderCompile(u32 type, const char* source);
 static i32 ShaderGetUniformLocation(Shader shader, const char* uniformName);
 
 RendererContext rContext = { };
+Shader defaultShader = { };
 static bool isInit;
 
 void GLClearError()
@@ -90,10 +98,8 @@ void RendererStartup(f32 width, f32 height)
     GLCall(glEnable(GL_BLEND));
     GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
-    // NOTE(Tony): Replace with ShaderLoadFromMemory
-    rContext.boundShader = ShaderLoadFromFiles("../resources/shaders/basic_vertex.glsl",
-                                               "../resources/shaders/basic_fragment.glsl");
-    ShaderBind(rContext.boundShader);
+    defaultShader = ShaderLoadDefault();
+    ShaderBind(defaultShader);
 
     RendererCreateViewport(width, height);
 
@@ -110,10 +116,12 @@ void RendererShutdown()
 {
     SASSERT_MSG(isInit == true, "Renderer is already shutdown");
 
-    ShaderUnload(&rContext.boundShader);
     VertexBufferLayoutDelete(&rContext.layout);
 
-    // NOTE(Tony): Delete default shader
+    if (defaultShader.rendererID != rContext.boundShader.rendererID) {
+        ShaderUnload(&defaultShader);
+    }
+    ShaderUnload(&rContext.boundShader);
 
     SMemZero(&rContext, sizeof(RendererContext));
 
@@ -346,10 +354,19 @@ void VertexBufferLayoutPushVec2(VertexBufferLayout* layout, u32 count)
 
 Shader ShaderLoadFromFiles(const char* vsFilePath, const char* fsFilePath)
 {
+    SASSERT(vsFilePath && fsFilePath);
+
     Shader result = { };
 
     char* vertexShader = FileLoad(vsFilePath);
     char* fragmentShader = FileLoad(fsFilePath);
+
+    if (!vertexShader || !fragmentShader) {
+        LOG_ERROR("Failed to load shader %s, %s", vsFilePath, fsFilePath);
+        return result;
+    }
+
+    result = ShaderLoadFromMemory(vertexShader, fragmentShader);
 
     u64 vsFilePathLen = strlen(vsFilePath);
     result.vsFilePath = (char*) SMalloc(vsFilePathLen + 1, MEMORY_TAG_STRING);
@@ -359,14 +376,57 @@ Shader ShaderLoadFromFiles(const char* vsFilePath, const char* fsFilePath)
     result.fsFilePath = (char*) SMalloc(fsFilePathLen + 1, MEMORY_TAG_STRING);
     SMemCopy(result.fsFilePath, fsFilePath, fsFilePathLen + 1);
 
-    result.rendererID = ShaderCreate(vertexShader, fragmentShader);
-
     FileUnload(vertexShader);
     FileUnload(fragmentShader);
+
+    return result;
+}
+
+Shader ShaderLoadFromMemory(const char* vsShader, const char* fsShader)
+{
+    Shader result = { };
+    result.rendererID = ShaderCreate(vsShader, fsShader);
 
     LOG_DEBUG("Shader(ID:%d): Loaded successfully", result.rendererID);
 
     return result;
+}
+
+Shader ShaderLoadDefault()
+{
+    const char* vertexShader = R"(
+        #version 330 core
+
+        layout(location = 0) in vec2 aPosition;
+        layout(location = 1) in vec2 aTexCord;
+
+        out vec2 ourTexCord;
+
+        uniform mat4 uMvp;
+
+        void main()
+        {
+            gl_Position = uMvp * vec4(aPosition, 0.0f, 1.0f);
+            ourTexCord = aTexCord;
+        }
+    )";
+
+    const char* fragmentShader = R"(
+        #version 330 core
+
+        out vec4 outColor;
+        in vec2 ourTexCord;
+
+        uniform vec4 uColor;
+        uniform sampler2D uTexture0;
+
+        void main()
+        {
+            outColor = texture(uTexture0, ourTexCord) * uColor;
+        }
+    )";
+
+    return ShaderLoadFromMemory(vertexShader, fragmentShader);
 }
 
 void ShaderUnload(Shader* shader)
@@ -394,6 +454,7 @@ static i32 ShaderGetUniformLocation(Shader shader, const char* uniformName)
 void ShaderBind(Shader shader)
 {
     GLCall(glUseProgram(shader.rendererID));
+    rContext.boundShader = shader;
 }
 
 void ShaderUnbind()
@@ -401,7 +462,12 @@ void ShaderUnbind()
     GLCall(glUseProgram(0));
 }
 
-static u32 ShaderCreate(char* vertexShader, char* fragmentShader)
+Shader* ShaderGetBound()
+{
+    return &rContext.boundShader;
+}
+
+static u32 ShaderCreate(const char* vertexShader, const char* fragmentShader)
 {
     GLCall(u32 program = glCreateProgram());
 
@@ -432,7 +498,7 @@ static u32 ShaderCreate(char* vertexShader, char* fragmentShader)
     return program;
 }
 
-static u32 ShaderCompile(u32 type, char* source)
+static u32 ShaderCompile(u32 type, const char* source)
 {
     GLCall(u32 id = glCreateShader(type));
     GLCall(glShaderSource(id, 1, &source, nullptr));
