@@ -223,6 +223,11 @@ static inline f32 Square(f32 x)
     return x * x;
 }
 
+static inline f32 Log(f32 x)
+{
+    return logf(x);
+}
+
 static inline Vec2 Vector2Zero()
 {
     Vec2 result = { 0 };
