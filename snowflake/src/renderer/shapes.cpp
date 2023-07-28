@@ -1,5 +1,6 @@
 #include "shapes.h"
 #include "core/sassert.h"
+#include "srenderer.h"
 
 Transform TransformCreate(Vec3 pos, Vec3 rotation, Vec3 scale, Vec3 origin)
 {
@@ -158,4 +159,33 @@ void SpriteSetTexRect(Sprite* sprite, Rectanglei rect)
 {
     SASSERT(sprite);
     sprite->textureRect = rect;
+}
+
+void DrawRingPro(const RingShape* ring)
+{
+    Mat4 transformMatrix = TransformGenerateMatrix(&ring->transform);
+    transformMatrix = MatrixScale(transformMatrix, Vec3{ ring->outerRadius, ring->outerRadius, 1.0f });
+    DrawRingPro(transformMatrix, ring->innerRadius, ring->outerRadius, ring->quadCount, ring->color);
+}
+
+void DrawRectanglePro(const RectangleShape* rect)
+{
+    Mat4 transformMatrix = TransformGenerateMatrix(&rect->transform);
+    transformMatrix = MatrixScale(transformMatrix, Vec3{ rect->width, rect->height, 1.0f });
+    DrawRectanglePro(transformMatrix, rect->color);
+}
+
+void DrawCirclePro(const CircleShape* circle)
+{
+    Mat4 transformMatrix = TransformGenerateMatrix(&circle->transform);
+    transformMatrix = MatrixScale(transformMatrix, Vec3{ circle->radius, circle->radius, 1.0f });
+    DrawCirclePro(transformMatrix, circle->pointCount, circle->color);
+}
+
+void DrawSpritePro(const Sprite* sprite)
+{
+    Mat4 transformMatrix = TransformGenerateMatrix(&sprite->transform);
+    transformMatrix = MatrixScale(transformMatrix, Vec3{ (f32) sprite->textureRect.width,
+                                                         (f32) sprite->textureRect.height, 1.0f });
+    DrawSpritePro(*sprite->texture, sprite->textureRect, transformMatrix, sprite->tint);
 }

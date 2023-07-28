@@ -64,3 +64,9 @@ SAPI Sprite SpriteCreate(Vec2 pos, const Texture2D* texture, Rectanglei texRect)
 SAPI Sprite SpriteCreate(Vec2 pos, const SubTexture2D* subTexture);
 SAPI void SpriteSetTexture(Sprite* sprite, const Texture2D* texture, bool8 resetRect = false);
 SAPI void SpriteSetTexture(Sprite* sprite, const SubTexture2D* subTexture, bool8 resetRect = false);
+
+SAPI void DrawCirclePro(const CircleShape* circle);
+SAPI void DrawEllipsePro(const EllipseShape* ellipse);
+SAPI void DrawRingPro(const RingShape* ring);
+SAPI void DrawRectanglePro(const RectangleShape* rect);
+SAPI void DrawSpritePro(const Sprite* sprite);

@@ -1,6 +1,7 @@
 #include "srenderer.h"
 #include "core/sassert.h"
 #include "core/smemory.h"
+#include "shapes.h"
 #include "srenderer_internal.h"
 
 #include <GL/glew.h>
@@ -96,13 +97,6 @@ void DrawCirclePro(Mat4 transformMatrix, i32 pointCount, Color color)
     RendererDraw(TRIANGLE_FAN, vertices, vertexCount, texture, transformMatrix);
 
     TextureUnload(&texture);
-}
-
-void DrawCirclePro(const CircleShape* circle)
-{
-    Mat4 transformMatrix = TransformGenerateMatrix(&circle->transform);
-    transformMatrix = MatrixScale(transformMatrix, Vec3{ circle->radius, circle->radius, 1.0f });
-    DrawCirclePro(transformMatrix, circle->pointCount, circle->color);
 }
 
 void DrawCircle(Vec2 pos, f32 radius, i32 pointCount, Color color)
@@ -204,13 +198,6 @@ void DrawRingPro(Mat4 transformMatrix, f32 innerRadius, f32 outerRadius, i32 qua
     TextureUnload(&texture);
 }
 
-void DrawRingPro(const RingShape* ring)
-{
-    Mat4 transformMatrix = TransformGenerateMatrix(&ring->transform);
-    transformMatrix = MatrixScale(transformMatrix, Vec3{ ring->outerRadius, ring->outerRadius, 1.0f });
-    DrawRingPro(transformMatrix, ring->innerRadius, ring->outerRadius, ring->quadCount, ring->color);
-}
-
 void DrawRing(Vec2 pos, f32 innerRadius, f32 outerRadius, i32 quadCount, Color color)
 {
     Transform transform = TransformCreate(Vector3(pos, 0.0f), Vector3Zero(), Vec3{ outerRadius, outerRadius, 1.0f });
@@ -238,13 +225,6 @@ void DrawRectanglePro(Mat4 transformMatrix, Color color)
     RendererDraw(TRIANGLES, vertices, 6, texture, transformMatrix);
 
     TextureUnload(&texture);
-}
-
-void DrawRectanglePro(const RectangleShape* rect)
-{
-    Mat4 transformMatrix = TransformGenerateMatrix(&rect->transform);
-    transformMatrix = MatrixScale(transformMatrix, Vec3{ rect->width, rect->height, 1.0f });
-    DrawRectanglePro(transformMatrix, rect->color);
 }
 
 void DrawRectangle(Vec2 pos, Vec2 size, f32 rotation, Color color)
@@ -277,14 +257,6 @@ void DrawSpritePro(Texture2D texture, Rectanglei texRect, Mat4 transformMatrix, 
     ShaderSetUniformVec4(*ShaderGetBound(), "uColor", colorNormalized);
 
     RendererDraw(TRIANGLES, vertices, 6, texture, transformMatrix);
-}
-
-void DrawSpritePro(const Sprite* sprite)
-{
-    Mat4 transformMatrix = TransformGenerateMatrix(&sprite->transform);
-    transformMatrix = MatrixScale(transformMatrix, Vec3{ (f32) sprite->textureRect.width,
-                                                         (f32) sprite->textureRect.height, 1.0f });
-    DrawSpritePro(*sprite->texture, sprite->textureRect, transformMatrix, sprite->tint);
 }
 
 void DrawSprite(SubTexture2D subTexture, Vec2 pos, f32 rotation, Color tint)
