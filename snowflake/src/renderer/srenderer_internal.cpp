@@ -541,7 +541,7 @@ void ShaderSetUniform2f(Shader shader, const char* uniformName, f32 v0, f32 v1)
     }
 }
 
-void ShaderSetUniform2f(Shader shader, const char* uniformName, Vec2 v)
+void ShaderSetUniformVec2(Shader shader, const char* uniformName, Vec2 v)
 {
     ShaderBind(shader);
     i32 location = ShaderGetUniformLocation(shader, uniformName);
@@ -559,7 +559,7 @@ void ShaderSetUniform3f(Shader shader, const char* uniformName, f32 v0, f32 v1, 
     }
 }
 
-void ShaderSetUniform3f(Shader shader, const char* uniformName, Vec3 v)
+void ShaderSetUniformVec3(Shader shader, const char* uniformName, Vec3 v)
 {
     ShaderBind(shader);
     i32 location = ShaderGetUniformLocation(shader, uniformName);
@@ -577,7 +577,7 @@ void ShaderSetUniform4f(Shader shader, const char* uniformName, f32 v0, f32 v1, 
     }
 }
 
-void ShaderSetUniform4f(Shader shader, const char* uniformName, Vec4 v)
+void ShaderSetUniformVec4(Shader shader, const char* uniformName, Vec4 v)
 {
     ShaderBind(shader);
     i32 location = ShaderGetUniformLocation(shader, uniformName);

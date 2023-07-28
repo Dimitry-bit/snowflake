@@ -166,7 +166,7 @@ void DrawText(Text text, Vec2 pos)
     f32 scale = (f32) text.characterSize / (f32) text.font->baseSize;
 
     Vec4 colorNormalized = ColorNormalize(text.fillColor);
-    ShaderSetUniform4f(*ShaderGetBound(), "uColor", colorNormalized);
+    ShaderSetUniformVec4(*ShaderGetBound(), "uColor", colorNormalized);
 
     for (const char* s = text.string; *s != '\0'; s++) {
         Glyph glyph = text.font->glyphTable[(u8) *s];
