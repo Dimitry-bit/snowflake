@@ -148,7 +148,7 @@ VertexBuffer VertexBufferInit(const void* data, u32 size)
     return result;
 }
 
-SAPI VertexBuffer VertexBufferInit(const Vertex* data, u32 count)
+VertexBuffer VertexBufferInit(const Vertex* data, u32 count)
 {
     VertexBuffer result = { };
     GLCall(glGenBuffers(1, &result.rendererID));
