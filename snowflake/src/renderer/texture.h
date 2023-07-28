@@ -29,7 +29,7 @@ struct SAPI SubTexture2D {
 };
 
 SAPI Texture2D TextureCreate(i32 width, i32 height, Color color);
-SAPI Texture2D TextureLoadFromMemory(u8* pixels, i32 width, i32 height);
+SAPI Texture2D TextureLoadFromMemory(const u8* pixels, i32 width, i32 height);
 SAPI Texture2D TextureLoadFromFile(const char* filePath);
 SAPI Texture2D TextureLoadFromImage(const Image* image);
 SAPI void TextureUnload(Texture2D* texture);
@@ -37,7 +37,7 @@ SAPI void TextureBind(Texture2D texture, i32 slot);
 SAPI void TextureUnbind();
 
 SAPI Image ImageCreate(i32 width, i32 height, Color color);
-SAPI Image ImageLoadFromMemory(u8* pixels, i32 width, i32 height);
+SAPI Image ImageLoadFromMemory(const u8* pixels, i32 width, i32 height);
 SAPI Image ImageLoadFromFile(const char* filePath);
 SAPI void ImageUnload(Image* image);
 

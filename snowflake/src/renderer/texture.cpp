@@ -16,7 +16,7 @@ Texture2D TextureCreate(i32 width, i32 height, Color color)
     return defaultTex;
 }
 
-Texture2D TextureLoadFromMemory(u8* pixels, i32 width, i32 height)
+Texture2D TextureLoadFromMemory(const u8* pixels, i32 width, i32 height)
 {
     Texture2D texture = { };
 
@@ -107,7 +107,7 @@ Image ImageCreate(i32 width, i32 height, Color color)
     return image;
 }
 
-Image ImageLoadFromMemory(u8* pixels, i32 width, i32 height)
+Image ImageLoadFromMemory(const u8* pixels, i32 width, i32 height)
 {
     Image image = { };
     image.nrChannel = 4;
