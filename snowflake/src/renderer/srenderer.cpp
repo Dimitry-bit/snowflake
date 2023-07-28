@@ -26,9 +26,13 @@ void DrawPixel(Vec2 pos, Color color)
     Vertex vertices[] = { { pos, Vector2Zero() } };
 
     Vec4 colorNormalized = ColorNormalize(color);
-    ShaderSetUniform4f(&rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
 
-    RendererDraw(POINTS, vertices, 1, nullptr);
+    Texture2D texture = TextureCreate(1, 1, WHITE);
+
+    RendererDraw(POINTS, vertices, 1, texture, Matrix4Identity());
+
+    TextureUnload(&texture);
 }
 
 void DrawLine(Vec2 startPos, Vec2 endPos, f32 width, Color color)
@@ -39,10 +43,15 @@ void DrawLine(Vec2 startPos, Vec2 endPos, f32 width, Color color)
     };
 
     Vec4 colorNormalized = ColorNormalize(color);
-    ShaderSetUniform4f(&rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
 
     GLCall(glLineWidth(width));
-    RendererDraw(LINES, vertices, 2, nullptr);
+
+    Texture2D texture = TextureCreate(1, 1, WHITE);
+
+    RendererDraw(LINES, vertices, 2, texture, Matrix4Identity());
+
+    TextureUnload(&texture);
 }
 
 void DrawTriangle(Vec2 v1, Vec2 v2, Vec2 v3, Color color)
@@ -54,15 +63,17 @@ void DrawTriangle(Vec2 v1, Vec2 v2, Vec2 v3, Color color)
     };
 
     Vec4 colorNormalized = ColorNormalize(color);
-    ShaderSetUniform4f(&rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
 
-    RendererDraw(TRIANGLES, vertices, 3, nullptr);
+    Texture2D texture = TextureCreate(1, 1, WHITE);
+
+    RendererDraw(TRIANGLES, vertices, 3, texture, Matrix4Identity());
+
+    TextureUnload(&texture);
 }
 
-void DrawCirclePro(const Mat4* transform, i32 pointCount, Color color)
+void DrawCirclePro(Mat4 transformMatrix, i32 pointCount, Color color)
 {
-    SASSERT(transform);
-
     i32 vertexCount = (pointCount + 2);
     i64 verticesSize = vertexCount * sizeof(Vertex);
     Vertex* vertices = (Vertex*) SAlloca(verticesSize);
@@ -78,16 +89,20 @@ void DrawCirclePro(const Mat4* transform, i32 pointCount, Color color)
     }
 
     Vec4 colorNormalized = ColorNormalize(color);
-    ShaderSetUniform4f(&rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
 
-    RendererDraw(TRIANGLE_FAN, vertices, vertexCount, nullptr, *transform);
+    Texture2D texture = TextureCreate(1, 1, WHITE);
+
+    RendererDraw(TRIANGLE_FAN, vertices, vertexCount, texture, transformMatrix);
+
+    TextureUnload(&texture);
 }
 
 void DrawCirclePro(const CircleShape* circle)
 {
     Mat4 transformMatrix = TransformGenerateMatrix(&circle->transform);
     transformMatrix = MatrixScale(transformMatrix, Vec3{ circle->radius, circle->radius, 1.0f });
-    DrawCirclePro(&transformMatrix, circle->pointCount, circle->color);
+    DrawCirclePro(transformMatrix, circle->pointCount, circle->color);
 }
 
 void DrawCircle(Vec2 pos, f32 radius, i32 pointCount, Color color)
@@ -95,13 +110,11 @@ void DrawCircle(Vec2 pos, f32 radius, i32 pointCount, Color color)
     Transform transform = TransformCreate(Vector3(pos, 0.0f), Vector3Zero(), Vec3{ radius, radius, 1.0f });
     Mat4 transformMatrix = TransformGenerateMatrix(&transform);
     transformMatrix = MatrixScale(transformMatrix, Vec3{ radius, radius, 1.0f });
-    DrawCirclePro(&transformMatrix, pointCount, color);
+    DrawCirclePro(transformMatrix, pointCount, color);
 }
 
-void DrawEllipsePro(const Mat4* transform, i32 pointCount, Color color)
+void DrawEllipsePro(Mat4 transformMatrix, i32 pointCount, Color color)
 {
-    SASSERT(transform);
-
     i32 vertexCount = (pointCount + 2);
     i64 verticesSize = vertexCount * sizeof(Vertex);
     Vertex* vertices = (Vertex*) SAlloca(verticesSize);
@@ -117,16 +130,20 @@ void DrawEllipsePro(const Mat4* transform, i32 pointCount, Color color)
     }
 
     Vec4 colorNormalized = ColorNormalize(color);
-    ShaderSetUniform4f(&rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
 
-    RendererDraw(TRIANGLE_FAN, vertices, vertexCount, nullptr, *transform);
+    Texture2D texture = TextureCreate(1, 1, WHITE);
+
+    RendererDraw(TRIANGLE_FAN, vertices, vertexCount, texture, transformMatrix);
+
+    TextureUnload(&texture);
 }
 
 void DrawEllipsePro(const EllipseShape* ellipse)
 {
     Mat4 transformMatrix = TransformGenerateMatrix(&ellipse->transform);
     transformMatrix = MatrixScale(transformMatrix, Vec3{ ellipse->radiusV, ellipse->radiusH, 1.0f });
-    DrawEllipsePro(&transformMatrix, ellipse->pointCount, ellipse->color);
+    DrawEllipsePro(transformMatrix, ellipse->pointCount, ellipse->color);
 }
 
 void DrawEllipse(Vec2 pos, f32 radiusV, f32 radiusH, i32 pointCount, Color color)
@@ -134,13 +151,11 @@ void DrawEllipse(Vec2 pos, f32 radiusV, f32 radiusH, i32 pointCount, Color color
     Transform transform = TransformCreate(Vector3(pos, 0.0f), Vector3Zero(), Vec3{ radiusV, radiusH });
     Mat4 transformMatrix = TransformGenerateMatrix(&transform);
     transformMatrix = MatrixScale(transformMatrix, Vec3{ radiusV, radiusH, 1.0f });
-    DrawEllipsePro(&transformMatrix, pointCount, color);
+    DrawEllipsePro(transformMatrix, pointCount, color);
 }
 
-void DrawRingPro(const Mat4* transform, f32 innerRadius, f32 outerRadius, i32 quadCount, Color color)
+void DrawRingPro(Mat4 transformMatrix, f32 innerRadius, f32 outerRadius, i32 quadCount, Color color)
 {
-    SASSERT(transform);
-
     i64 verticesSize = 6 * quadCount * sizeof(Vertex);
     Vertex* vertices = (Vertex*) SAlloca(verticesSize);
     SMemZero(vertices, verticesSize);
@@ -180,16 +195,20 @@ void DrawRingPro(const Mat4* transform, f32 innerRadius, f32 outerRadius, i32 qu
     }
 
     Vec4 colorNormalized = ColorNormalize(color);
-    ShaderSetUniform4f(&rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
 
-    RendererDraw(TRIANGLES, vertices, 6 * quadCount, nullptr, *transform);
+    Texture2D texture = TextureCreate(1, 1, WHITE);
+
+    RendererDraw(TRIANGLES, vertices, 6 * quadCount, texture, transformMatrix);
+
+    TextureUnload(&texture);
 }
 
 void DrawRingPro(const RingShape* ring)
 {
     Mat4 transformMatrix = TransformGenerateMatrix(&ring->transform);
     transformMatrix = MatrixScale(transformMatrix, Vec3{ ring->outerRadius, ring->outerRadius, 1.0f });
-    DrawRingPro(&transformMatrix, ring->innerRadius, ring->outerRadius, ring->quadCount, ring->color);
+    DrawRingPro(transformMatrix, ring->innerRadius, ring->outerRadius, ring->quadCount, ring->color);
 }
 
 void DrawRing(Vec2 pos, f32 innerRadius, f32 outerRadius, i32 quadCount, Color color)
@@ -197,13 +216,11 @@ void DrawRing(Vec2 pos, f32 innerRadius, f32 outerRadius, i32 quadCount, Color c
     Transform transform = TransformCreate(Vector3(pos, 0.0f), Vector3Zero(), Vec3{ outerRadius, outerRadius, 1.0f });
     Mat4 transformMatrix = TransformGenerateMatrix(&transform);
     transformMatrix = MatrixScale(transformMatrix, Vec3{ outerRadius, outerRadius, 1.0f });
-    DrawRingPro(&transformMatrix, innerRadius, outerRadius, quadCount, color);
+    DrawRingPro(transformMatrix, innerRadius, outerRadius, quadCount, color);
 }
 
-void DrawRectanglePro(const Mat4* transform, Color color)
+void DrawRectanglePro(Mat4 transformMatrix, Color color)
 {
-    SASSERT(transform);
-
     Vertex vertices[] = {
         { Vec2{ 0, 1 }, Vec2{ 0.0f, 1.0f } },
         { Vec2{ 1, 1 }, Vec2{ 1.0f, 1.0f } },
@@ -214,16 +231,20 @@ void DrawRectanglePro(const Mat4* transform, Color color)
     };
 
     Vec4 colorNormalized = ColorNormalize(color);
-    ShaderSetUniform4f(&rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
 
-    RendererDraw(TRIANGLES, vertices, 6, nullptr, *transform);
+    Texture2D texture = TextureCreate(1, 1, WHITE);
+
+    RendererDraw(TRIANGLES, vertices, 6, texture, transformMatrix);
+
+    TextureUnload(&texture);
 }
 
 void DrawRectanglePro(const RectangleShape* rect)
 {
     Mat4 transformMatrix = TransformGenerateMatrix(&rect->transform);
     transformMatrix = MatrixScale(transformMatrix, Vec3{ rect->width, rect->height, 1.0f });
-    DrawRectanglePro(&transformMatrix, rect->color);
+    DrawRectanglePro(transformMatrix, rect->color);
 }
 
 void DrawRectangle(Vec2 pos, Vec2 size, f32 rotation, Color color)
@@ -231,20 +252,17 @@ void DrawRectangle(Vec2 pos, Vec2 size, f32 rotation, Color color)
     Transform transform = TransformCreate(Vector3(pos, 0.0f), Vec3{ 0.0f, 0.0f, rotation }, Vector3(size, 1.0f));
     Mat4 transformMatrix = TransformGenerateMatrix(&transform);
     transformMatrix = MatrixScale(transformMatrix, Vec3{ size.x, size.y, 1.0f });
-    DrawRectanglePro(&transformMatrix, color);
+    DrawRectanglePro(transformMatrix, color);
 }
 
-void DrawSpritePro(const Texture2D* texture, Rectanglei texRect, const Mat4* transform, Color tint)
+void DrawSpritePro(Texture2D texture, Rectanglei texRect, Mat4 transformMatrix, Color tint)
 {
-    SASSERT(transform);
-    SASSERT(texture);
-
-    f32 texCoordLeft = (f32) texRect.left / (f32) texture->width;
-    f32 texCoordRight = (f32) (texRect.left + texRect.width) / (f32) texture->width;
+    f32 texCoordLeft = (f32) texRect.left / (f32) texture.width;
+    f32 texCoordRight = (f32) (texRect.left + texRect.width) / (f32) texture.width;
 
     // NOTE(Tony): texture is vertically flipped
-    f32 texCoordBottom = (f32) texRect.top / (f32) texture->height;
-    f32 texCoordTop = (f32) (texRect.top + texRect.height) / (f32) texture->height;
+    f32 texCoordBottom = (f32) texRect.top / (f32) texture.height;
+    f32 texCoordTop = (f32) (texRect.top + texRect.height) / (f32) texture.height;
 
     Vertex vertices[] = {
         { Vec2{ 0, 1 }, Vec2{ texCoordLeft, texCoordTop } },
@@ -256,9 +274,9 @@ void DrawSpritePro(const Texture2D* texture, Rectanglei texRect, const Mat4* tra
     };
 
     Vec4 colorNormalized = ColorNormalize(tint);
-    ShaderSetUniform4f(&rContext.boundShader, "uColor", colorNormalized);
+    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
 
-    RendererDraw(TRIANGLES, vertices, 6, texture, *transform);
+    RendererDraw(TRIANGLES, vertices, 6, texture, transformMatrix);
 }
 
 void DrawSpritePro(const Sprite* sprite)
@@ -266,24 +284,24 @@ void DrawSpritePro(const Sprite* sprite)
     Mat4 transformMatrix = TransformGenerateMatrix(&sprite->transform);
     transformMatrix = MatrixScale(transformMatrix, Vec3{ (f32) sprite->textureRect.width,
                                                          (f32) sprite->textureRect.height, 1.0f });
-    DrawSpritePro(sprite->texture, sprite->textureRect, &transformMatrix, sprite->tint);
+    DrawSpritePro(*sprite->texture, sprite->textureRect, transformMatrix, sprite->tint);
 }
 
-void DrawSprite(const SubTexture2D* subTexture, Vec2 pos, f32 rotation, Color tint)
+void DrawSprite(SubTexture2D subTexture, Vec2 pos, f32 rotation, Color tint)
 {
     Transform transform = TransformCreate(Vector3(pos, 0.0f),
                                           Vec3{ 0.0f, 0.0f, rotation },
-                                          Vec3{ (f32) subTexture->rect.width, (f32) subTexture->rect.height, 1.0f });
+                                          Vec3{ (f32) subTexture.rect.width, (f32) subTexture.rect.height, 1.0f });
     Mat4 transformMatrix = TransformGenerateMatrix(&transform);
-    DrawSpritePro(subTexture->texture, subTexture->rect, &transformMatrix, tint);
+    DrawSpritePro(*subTexture.texture, subTexture.rect, transformMatrix, tint);
 }
 
-void DrawSprite(const Texture2D* texture, Vec2 pos, f32 rotation, Color tint)
+void DrawSprite(Texture2D texture, Vec2 pos, f32 rotation, Color tint)
 {
     Transform transform = TransformCreate(Vector3(pos, 0.0f),
                                           Vec3{ 0.0f, 0.0f, rotation },
-                                          Vec3{ (f32) texture->width, (f32) texture->height, 1.0f });
+                                          Vec3{ (f32) texture.width, (f32) texture.height, 1.0f });
     Mat4 transformMatrix = TransformGenerateMatrix(&transform);
-    Rectanglei texCoord = { 0, 0, texture->width, texture->height };
-    DrawSpritePro(texture, texCoord, &transformMatrix, tint);
+    Rectanglei texCoord = { 0, 0, texture.width, texture.height };
+    DrawSpritePro(texture, texCoord, transformMatrix, tint);
 }

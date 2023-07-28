@@ -43,7 +43,7 @@ int main()
 //        TestPrimitiveShapes();
         TestTextureDrawing(&tex);
 
-        DrawText(&testText, Vec2{ 100, 100 });
+        DrawText(testText, Vec2{ 100, 100 });
 
         EndDrawing();
         PollInputEvents();

@@ -72,12 +72,10 @@ void TextureUnload(Texture2D* texture)
     SMemZero(texture, sizeof(Texture2D));
 }
 
-void TextureBind(const Texture2D* texture, i32 slot)
+void TextureBind(Texture2D texture, i32 slot)
 {
-    SASSERT(texture);
-
     GLCall(glActiveTexture(GL_TEXTURE0 + slot));
-    GLCall(glBindTexture(GL_TEXTURE_2D, texture->rendererID));
+    GLCall(glBindTexture(GL_TEXTURE_2D, texture.rendererID));
 }
 
 void TextureUnbind()

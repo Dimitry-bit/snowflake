@@ -154,35 +154,30 @@ static Glyph FontGetGlyph(FT_Face face, u8 glyphID)
     return glyph;
 }
 
-void DrawText(const Text* text, Vec2 pos)
+void DrawText(Text text, Vec2 pos)
 {
-    SASSERT(text);
-
-    if (!text->font) {
+    if (!text.font) {
         return;
     }
 
-    VertexBuffer vb = { };
-    GLCall(glGenBuffers(1, &vb.rendererID));
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER, vb.rendererID));
-    GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 6, nullptr, GL_DYNAMIC_DRAW));
+    VertexBuffer vb = VertexBufferInit((Vertex*) nullptr, 6);
 
-    const Texture2D* texture = &text->font->texture;
-    f32 scale = (f32) text->characterSize / (f32) text->font->baseSize;
+    Texture2D texture = text.font->texture;
+    f32 scale = (f32) text.characterSize / (f32) text.font->baseSize;
 
-    Vec4 colorNormalized = ColorNormalize(text->fillColor);
-    ShaderSetUniform4f(&rContext.boundShader, "uColor", colorNormalized);
+    Vec4 colorNormalized = ColorNormalize(text.fillColor);
+    ShaderSetUniform4f(rContext.boundShader, "uColor", colorNormalized);
 
-    for (const char* s = text->string; *s != '\0'; s++) {
-        Glyph glyph = text->font->glyphTable[(u8) *s];
+    for (const char* s = text.string; *s != '\0'; s++) {
+        Glyph glyph = text.font->glyphTable[(u8) *s];
         f32 xPos = pos.x + (f32) glyph.bearingX * scale;
         f32 yPos = pos.y - (f32) glyph.bearingY * scale;
 
-        Rectanglei texRect = text->font->texRects[(u8) *s];
-        f32 texCoordLeft = (f32) texRect.left / (f32) texture->width;
-        f32 texCoordRight = (f32) (texRect.left + texRect.width) / (f32) texture->width;
-        f32 texCoordTop = (f32) texRect.top / (f32) texture->height;
-        f32 texCoordBottom = (f32) (texRect.top + texRect.height) / (f32) texture->height;
+        Rectanglei texRect = text.font->texRects[(u8) *s];
+        f32 texCoordLeft = (f32) texRect.left / (f32) texture.width;
+        f32 texCoordRight = (f32) (texRect.left + texRect.width) / (f32) texture.width;
+        f32 texCoordTop = (f32) texRect.top / (f32) texture.height;
+        f32 texCoordBottom = (f32) (texRect.top + texRect.height) / (f32) texture.height;
 
         f32 w = (f32) glyph.width * scale;
         f32 h = (f32) glyph.height * scale;
@@ -198,7 +193,7 @@ void DrawText(const Text* text, Vec2 pos)
 
         GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices));
 
-        RendererDraw(TRIANGLES, &vb, 6, texture);
+        RendererDraw(TRIANGLES, vb, 6, texture, Matrix4Identity());
 
         pos.x += (f32) (glyph.advance >> 6) * scale;
     }

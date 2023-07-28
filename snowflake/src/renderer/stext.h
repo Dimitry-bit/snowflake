@@ -32,7 +32,7 @@ struct SAPI Text {
 SAPI Font FontLoadFromFile(const char* filePath, u32 baseSize = 48);
 SAPI void FontUnload(Font* font);
 
-SAPI void DrawText(const Text* text, Vec2 pos);
+SAPI void DrawText(Text text, Vec2 pos);
 
 SAPI Text TextCreate(const Font* font, Color color = WHITE);
 SAPI void TextDelete(Text* text);
