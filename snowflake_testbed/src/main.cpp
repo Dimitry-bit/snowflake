@@ -85,16 +85,14 @@ static void TestInput()
 
 static void TestPrimitiveShapes()
 {
-    f32 width = 50.0f;
-    f32 height = 50.0f;
+    Vec2 size = { 50.0f, 50.0f };
     f32 padding = 20.0f;
-    i32 countX = (GetWindowWidth() - (padding * 2)) / width;
-    i32 countY = (GetWindowHeight() - (padding * 2)) / height;
+    i32 countX = (GetWindowWidth() - (padding * 2)) / size.x;
+    i32 countY = (GetWindowHeight() - (padding * 2)) / size.y;
     for (i32 i = 0; i < countX; ++i) {
         for (i32 j = 0; j < countY; ++j) {
-            f32 posX = padding + i * (width + padding);
-            f32 posY = padding + j * (height + padding);
-            RectangleShape rect = RectangleCreate(Vec2{ posX, posY }, Vec2{ width, height }, ANGLEBLUE);
+            Vec2 pos = { padding + i * (size.x + padding), padding + j * (size.y + padding) };
+            RectangleShape rect = RectangleCreate(pos, size, ANGLEBLUE);
             rect.transform.rotation = Vec3{ 0.0f, 0.0f, Sin((f32) GetTime()) };
             rect.transform.origin = Vec3{ 0.5f * rect.width, 0.5f * rect.height, 0.0f };
             DrawRectanglePro(&rect);
