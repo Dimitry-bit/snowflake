@@ -623,14 +623,14 @@ void ShaderSetMatrix4(Shader shader, const char* uniformName, Mat4 mat)
 }
 
 void RendererDraw(DrawMode mode, VertexArray va, IndexBuffer ib, Texture2D texture,
-                  Mat4 modelMatrix)
+                  Mat4 transformMatrix)
 {
     SASSERT_MSG(isInit, "Renderer is not started")
 
     VertexArrayBind(va);
     IndexBufferBind(ib);
 
-    Mat4 mvp = rContext.projMatrix * rContext.viewMatrix * modelMatrix;
+    Mat4 mvp = rContext.projMatrix * rContext.viewMatrix * transformMatrix;
     ShaderSetMatrix4(rContext.boundShader, "uMvp", mvp);
 
     TextureBind(texture, 0);
