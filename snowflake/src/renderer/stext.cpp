@@ -160,8 +160,6 @@ void DrawText(Text text, Vec2 pos)
         return;
     }
 
-    VertexBuffer vb = VertexBufferInit((Vertex*) nullptr, 6);
-
     Texture2D texture = text.font->texture;
     f32 scale = (f32) text.characterSize / (f32) text.font->baseSize;
 
@@ -191,14 +189,10 @@ void DrawText(Text text, Vec2 pos)
             { Vec2{ xPos + w, yPos + h }, Vec2{ texCoordRight, texCoordBottom } }
         };
 
-        GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices));
-
-        RendererDraw(TRIANGLES, vb, 6, texture, Matrix4Identity());
+        RendererDraw(TRIANGLES, vertices, 6, texture, Matrix4Identity());
 
         pos.x += (f32) (glyph.advance >> 6) * scale;
     }
-
-    VertexBufferDelete(&vb);
 }
 
 Text TextCreate(const Font* font, Color color)

@@ -116,5 +116,4 @@ SAPI void ShaderSetMatrix4(Shader shader, const char* uniformName, Mat4 mat);
 
 SAPI void RendererDraw(DrawMode mode, VertexArray va, IndexBuffer ib, Texture2D texture, Mat4 transformMatrix);
 SAPI void RendererDraw(DrawMode mode, VertexArray va, u32 count, Texture2D texture, Mat4 transformMatrix);
-SAPI void RendererDraw(DrawMode mode, VertexBuffer vb, u32 count, Texture2D texture, Mat4 transformMatrix);
 SAPI void RendererDraw(DrawMode mode, const Vertex* vertices, u32 count, Texture2D texture, Mat4 transformMatrix);
