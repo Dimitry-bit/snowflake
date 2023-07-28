@@ -179,7 +179,7 @@ void VertexBufferUnbind()
     GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }
 
-IndexBuffer IndexBufferInit(const void* data, u32 count)
+IndexBuffer IndexBufferInit(const u32* data, u32 count)
 {
     IndexBuffer result = { };
     result.count = count;

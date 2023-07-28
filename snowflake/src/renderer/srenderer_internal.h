@@ -73,7 +73,7 @@ SAPI void VertexBufferDelete(VertexBuffer* vb);
 SAPI void VertexBufferBind(VertexBuffer vb);
 SAPI void VertexBufferUnbind();
 
-SAPI IndexBuffer IndexBufferInit(const void* data, u32 count);
+SAPI IndexBuffer IndexBufferInit(const u32* data, u32 count);
 SAPI void IndexBufferDelete(IndexBuffer* ib);
 SAPI void IndexBufferBind(IndexBuffer ib);
 SAPI void IndexBufferUnbind();
