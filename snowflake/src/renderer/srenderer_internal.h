@@ -2,7 +2,6 @@
 
 #include "core/defines.h"
 #include "math/smath.h"
-#include "srenderer.h"
 #include "texture.h"
 
 #include <GL/glew.h>
@@ -51,6 +50,11 @@ struct SAPI VertexBufferLayout {
     VertexBufferElement* elementsBegin;
     VertexBufferElement* elementsEnd;
     u32 stride;
+};
+
+struct SAPI Vertex {
+    Vec2 position;
+    Vec2 texCord;
 };
 
 struct SAPI Shader {

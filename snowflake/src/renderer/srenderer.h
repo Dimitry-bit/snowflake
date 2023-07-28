@@ -5,11 +5,6 @@
 #include "math/smath.h"
 #include "texture.h"
 
-struct SAPI Vertex {
-    Vec2 position;
-    Vec2 texCord;
-};
-
 SAPI void ClearBackground(u8 r, u8 g, u8 b, u8 a);
 SAPI void ClearBackground(Color color);
 
