@@ -234,19 +234,18 @@ void TextSetString(Text* text, const char* string)
     text->string[size] = '\0';
 }
 
-void TextSetString(Text* text, const StringViewer* stringViewer)
+void TextSetString(Text* text, StringViewer stringViewer)
 {
     SASSERT(text);
-    SASSERT(stringViewer);
 
     SFree(text->string);
     text->string = nullptr;
 
-    if (!stringViewer->data || stringViewer->length <= 0) {
+    if (!stringViewer.data || stringViewer.length <= 0) {
         return;
     }
 
-    text->string = (char*) SMalloc(stringViewer->length, MEMORY_TAG_STRING);
-    SMemCopy(text->string, stringViewer->data, stringViewer->length - 1);
-    text->string[stringViewer->length - 1] = '\0';
+    text->string = (char*) SMalloc(stringViewer.length, MEMORY_TAG_STRING);
+    SMemCopy(text->string, stringViewer.data, stringViewer.length - 1);
+    text->string[stringViewer.length - 1] = '\0';
 }

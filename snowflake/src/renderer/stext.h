@@ -38,4 +38,4 @@ SAPI Text TextCreate(const Font* font, Color color = WHITE);
 SAPI void TextDelete(Text* text);
 SAPI void TextSetCharacterSize(Text* text, u32 size);
 SAPI void TextSetString(Text* text, const char* string);
-SAPI void TextSetString(Text* text, const StringViewer* stringViewer);
+SAPI void TextSetString(Text* text, StringViewer stringViewer);
