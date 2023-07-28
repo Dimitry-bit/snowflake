@@ -1,4 +1,5 @@
 #include "texture.h"
+#include "core/logger.h"
 #include "core/sassert.h"
 #include "core/smemory.h"
 #include "simage_loader.h"
@@ -26,22 +27,19 @@ Texture2D TextureLoadFromMemory(const u8* pixels, i32 width, i32 height)
 
     texture.width = width;
     texture.height = height;
-    texture.nrChannel = 4;
+    texture.format = PIXEL_FORMAT_RGBA8;
+    texture.mipmaps = 1;
 
     GLCall(glGenTextures(1, &texture.rendererID));
-    GLCall(glBindTexture(GL_TEXTURE_2D, texture.rendererID));
 
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT));
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT));
+    TextureGenerateMipmap(texture);
+    TextureSetFilter(texture, TEXTURE_FILTER_TRILINEAR);
+    TextureSetWrap(texture, TEXTURE_WRAP_MIRROR_REPEAT);
 
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
-    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-
+    TextureBind(texture, 0);
     GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texture.width, texture.height, 0,
                         GL_RGBA, GL_UNSIGNED_BYTE, pixels));
-    GLCall(glGenerateMipmap(GL_TEXTURE_2D));
-
-    GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+    TextureUnbind();
 
     return texture;
 }
@@ -83,10 +81,87 @@ void TextureUnbind()
     GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 }
 
+void TextureSetFilter(Texture2D texture, TextureFilter filter)
+{
+    TextureBind(texture, 0);
+
+    switch (filter) {
+        case TEXTURE_FILTER_POINT: {
+            if (texture.mipmaps > 1) {
+                GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST));
+            } else {
+                GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+            }
+            GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+        }
+            break;
+        case TEXTURE_FILTER_BILINEAR: {
+            if (texture.mipmaps > 1) {
+                GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST));
+            } else {
+                GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+            }
+            GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+        }
+            break;
+        case TEXTURE_FILTER_TRILINEAR: {
+            if (texture.mipmaps > 1) {
+                GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
+            } else {
+                GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+            }
+            GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+        }
+            break;
+        default: SASSERT_MSG(false, "Texture filter not supported!");
+            break;
+    }
+}
+
+void TextureSetWrap(Texture2D texture, TextureWrap wrap)
+{
+    TextureBind(texture, 0);
+
+    switch (wrap) {
+        case TEXTURE_WRAP_REPEAT: {
+            GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
+            GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+        }
+            break;
+        case TEXTURE_WRAP_CLAMP: {
+            GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+            GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+        }
+            break;
+        case TEXTURE_WRAP_MIRROR_REPEAT: {
+            GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT));
+            GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT));
+        }
+            break;
+        case TEXTURE_WRAP_MIRROR_CLAMP: {
+            GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRROR_CLAMP_TO_EDGE));
+            GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRROR_CLAMP_TO_EDGE));
+        }
+            break;
+        default: SASSERT_MSG(false, "Texture wrap mode not supported!");
+            break;
+    }
+}
+
+void TextureGenerateMipmap(Texture2D texture)
+{
+    TextureBind(texture, 0);
+
+    GLCall(glGenerateMipmap(GL_TEXTURE_2D));
+    texture.mipmaps = 1 + (i32) Floor(Log((f32) Max(texture.width, texture.height)) / Log(2));
+
+    LOG_INFO("Texture [ID: %d]: Mipmaps generated, total %d", texture.rendererID, texture.mipmaps);
+}
+
 Image ImageCreate(i32 width, i32 height, Color color)
 {
     Image image = { };
-    image.nrChannel = 4;
+    image.format = PIXEL_FORMAT_RGBA8;
 
     if (width <= 0 || height <= 0) {
         return image;
@@ -110,7 +185,7 @@ Image ImageCreate(i32 width, i32 height, Color color)
 Image ImageLoadFromMemory(const u8* pixels, i32 width, i32 height)
 {
     Image image = { };
-    image.nrChannel = 4;
+    image.format = PIXEL_FORMAT_RGBA8;
 
     if (width <= 0 || height <= 0) {
         return image;
