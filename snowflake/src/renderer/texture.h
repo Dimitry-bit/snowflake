@@ -32,13 +32,13 @@ SAPI Texture2D TextureCreate(i32 width, i32 height, Color color);
 SAPI Texture2D TextureLoadFromMemory(u8* pixels, i32 width, i32 height);
 SAPI Texture2D TextureLoadFromFile(const char* filePath);
 SAPI Texture2D TextureLoadFromImage(const Image* image);
-SAPI void TextureDelete(Texture2D* texture);
+SAPI void TextureUnload(Texture2D* texture);
 SAPI void TextureBind(const Texture2D* texture, i32 slot);
 SAPI void TextureUnbind();
 
 SAPI Image ImageCreate(i32 width, i32 height, Color color);
 SAPI Image ImageLoadFromMemory(u8* pixels, i32 width, i32 height);
 SAPI Image ImageLoadFromFile(const char* filePath);
-SAPI void ImageDelete(Image* image);
+SAPI void ImageUnload(Image* image);
 
 SAPI SubTexture2D SubTexture2DCreate(const Texture2D* texture, Vec2 pos, Vec2 cellSize, Vec2 spriteSize);

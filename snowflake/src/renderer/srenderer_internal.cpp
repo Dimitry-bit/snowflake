@@ -115,11 +115,11 @@ void RendererShutdown()
 {
     SASSERT_MSG(isInit == true, "Renderer is already shutdown");
 
-    ShaderDelete(&rContext.boundShader);
+    ShaderUnload(&rContext.boundShader);
     VertexBufferLayoutDelete(&rContext.layout);
 
     // NOTE(Tony): Delete default shader
-    TextureDelete(&defaultTexture);
+    TextureUnload(&defaultTexture);
 
     SMemZero(&rContext, sizeof(RendererContext));
 
@@ -378,7 +378,7 @@ Shader ShaderLoadFromFiles(const char* vsFilePath, const char* fsFilePath)
     return result;
 }
 
-void ShaderDelete(Shader* shader)
+void ShaderUnload(Shader* shader)
 {
     SASSERT_MSG(shader, "Shader can't be null");
 

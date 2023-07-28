@@ -47,12 +47,12 @@ Font FontLoadFromFile(const char* filePath, u32 baseSize)
     return font;
 }
 
-void FontDelete(Font* font)
+void FontUnload(Font* font)
 {
-    TextureDelete(&font->texture);
+    TextureUnload(&font->texture);
 
     for (u8 c = 0; c < font->glyphCount; c++) {
-        ImageDelete(&font->glyphTable[c].bitmap);
+        ImageUnload(&font->glyphTable[c].bitmap);
     }
 
     SFree(font->glyphTable);

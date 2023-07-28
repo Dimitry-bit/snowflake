@@ -11,7 +11,7 @@ Texture2D TextureCreate(i32 width, i32 height, Color color)
     Texture2D defaultTex = { };
     Image image = ImageCreate(width, height, color);
     defaultTex = TextureLoadFromImage(&image);
-    ImageDelete(&image);
+    ImageUnload(&image);
 
     return defaultTex;
 }
@@ -64,7 +64,7 @@ Texture2D TextureLoadFromImage(const Image* image)
     return TextureLoadFromMemory(image->pixels, image->width, image->height);
 }
 
-void TextureDelete(Texture2D* texture)
+void TextureUnload(Texture2D* texture)
 {
     SASSERT(texture);
 
@@ -143,7 +143,7 @@ Image ImageLoadFromFile(const char* filePath)
     return image;
 }
 
-void ImageDelete(Image* image)
+void ImageUnload(Image* image)
 {
     SASSERT(image);
 

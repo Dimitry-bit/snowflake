@@ -99,7 +99,7 @@ SAPI void VertexBufferLayoutPushUByte(VertexBufferLayout* layout, u32 count);
 SAPI void VertexBufferLayoutPushVec2(VertexBufferLayout* layout, u32 count);
 
 SAPI Shader ShaderLoadFromFiles(const char* vsFilePath, const char* fsFilePath);
-SAPI void ShaderDelete(Shader* shader);
+SAPI void ShaderUnload(Shader* shader);
 SAPI void ShaderBind(const Shader* shader);
 SAPI void ShaderUnbind();
 SAPI void ShaderSetUniform1f(Shader* shader, const char* uniformName, f32 v);

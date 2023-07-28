@@ -50,8 +50,8 @@ int main()
     }
 
     TextDelete(&testText);
-    TextureDelete(&tex);
-    FontDelete(&font);
+    TextureUnload(&tex);
+    FontUnload(&font);
 
     CloseWindow();
 }
