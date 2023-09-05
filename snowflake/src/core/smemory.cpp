@@ -58,6 +58,10 @@ void* SMalloc(u32 size, MemoryTags tag)
 #endif
 
     void* block = malloc(size);
+    if (!block) {
+        SASSERT_MSG(!block, "[FATAL]: Out Of Memory");
+    }
+
     memset(block, 0, size);
 
 #ifdef SNOWFLAKE_MEM_DEBUG
