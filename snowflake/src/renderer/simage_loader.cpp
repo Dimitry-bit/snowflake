@@ -64,6 +64,9 @@ void SImageUnload(void* data)
 static u8* SImageLoadBmp(const char* filePath, i32* width, i32* height, i32* nrChannels)
 {
     u8* file = FileLoadBinary(filePath);
+    if (!file) {
+        return nullptr;
+    }
 
     BitmapFileHeader fileHeader = *((BitmapFileHeader*) file);
     SASSERT(fileHeader.headerField[0] == 'B' && fileHeader.headerField[1] == 'M');
@@ -87,10 +90,7 @@ static u8* SImageLoadBmp(const char* filePath, i32* width, i32* height, i32* nrC
     bool8 gFound = BitScanForward(&greenShift, infoHeader.greenMask);
     bool8 bFound = BitScanForward(&blueShift, infoHeader.blueMask);
     bool8 aFound = BitScanForward(&alphaShift, alphaMask);
-    SASSERT(rFound);
-    SASSERT(gFound);
-    SASSERT(bFound);
-    SASSERT(aFound);
+    SASSERT(rFound && gFound && bFound && aFound);
 
     u32* tmpImageData = (u32*) (file + fileHeader.offset);
     for (u32 i = 0; i < imageDataSize; i++) {
