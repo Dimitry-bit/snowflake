@@ -63,7 +63,7 @@ SAPI RectangleShape RectangleCreate(Vec2 pos, Vec2 size, Color color = WHITE);
 SAPI Sprite SpriteCreate(Vec2 pos, const Texture2D* texture, Rectanglei texRect);
 SAPI Sprite SpriteCreate(Vec2 pos, const SubTexture2D* subTexture);
 SAPI void SpriteSetTexture(Sprite* sprite, const Texture2D* texture, bool8 resetRect = false);
-SAPI void SpriteSetTexture(Sprite* sprite, const SubTexture2D* subTexture, bool8 resetRect = false);
+SAPI void SpriteSetTexture(Sprite* sprite, SubTexture2D subTexture, bool8 resetRect = false);
 
 SAPI void DrawCirclePro(const CircleShape* circle);
 SAPI void DrawEllipsePro(const EllipseShape* ellipse);

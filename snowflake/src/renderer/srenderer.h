@@ -24,6 +24,6 @@ SAPI void DrawRing(Vec2 pos, f32 innerRadius, f32 outerRadius, i32 quadCount, Co
 SAPI void DrawRectanglePro(Mat4 transformMatrix, Color color);
 SAPI void DrawRectangle(Vec2 pos, Vec2 size, f32 rotation, Color color);
 
-SAPI void DrawSpritePro(Texture2D texture, Rectanglei texRect, Mat4 transformMatrix, Color tint);
+SAPI void DrawSpritePro(const Texture2D* texture, Rectanglei texRect, Mat4 transformMatrix, Color tint);
 SAPI void DrawSprite(SubTexture2D subTexture, Vec2 pos, f32 rotation, Color tint);
-SAPI void DrawSprite(Texture2D texture, Vec2 pos, f32 rotation, Color tint);
+SAPI void DrawSprite(const Texture2D* texture, Vec2 pos, f32 rotation, Color tint);

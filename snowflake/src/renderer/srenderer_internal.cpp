@@ -221,8 +221,8 @@ VertexArray VertexArrayInit()
 void VertexArrayDelete(VertexArray* va)
 {
     SASSERT_MSG(va, "VertexArray can't be null");
-    GLCall(glDeleteVertexArrays(1, &va->rendererID));
 
+    GLCall(glDeleteVertexArrays(1, &va->rendererID));
     SMemZero(va, sizeof(VertexArray));
 }
 
@@ -622,38 +622,39 @@ void ShaderSetMatrix4(Shader shader, const char* uniformName, Mat4 mat)
     }
 }
 
-void RendererDraw(DrawMode mode, VertexArray va, IndexBuffer ib, Texture2D texture,
-                  Mat4 transformMatrix)
+void RendererDraw(DrawMode mode, VertexArray va, IndexBuffer ib, const Texture2D* texture, Mat4 transformMatrix)
 {
-    SASSERT_MSG(isInit, "Renderer is not started")
+    SASSERT_MSG(isInit, "Renderer is not started");
+    SASSERT_MSG(texture, "texture can't be null");
 
+    TextureBind(texture, 0);
     VertexArrayBind(va);
     IndexBufferBind(ib);
 
     Mat4 mvp = rContext.projMatrix * rContext.viewMatrix * transformMatrix;
     ShaderSetMatrix4(rContext.boundShader, "uMvp", mvp);
 
-    TextureBind(texture, 0);
-
     GLCall(glDrawElements(mode, ib.count, GL_UNSIGNED_INT, nullptr));
 }
 
-void RendererDraw(DrawMode mode, VertexArray va, u32 count, Texture2D texture, Mat4 transformMatrix)
+void RendererDraw(DrawMode mode, VertexArray va, u32 count, const Texture2D* texture, Mat4 transformMatrix)
 {
-    SASSERT_MSG(isInit, "Renderer is not started")
+    SASSERT_MSG(isInit, "Renderer is not started");
+    SASSERT_MSG(texture, "texture can't be null");
 
+    TextureBind(texture, 0);
     VertexArrayBind(va);
 
     Mat4 mvp = rContext.projMatrix * rContext.viewMatrix * transformMatrix;
     ShaderSetMatrix4(rContext.boundShader, "uMvp", mvp);
 
-    TextureBind(texture, 0);
-
     GLCall(glDrawArrays(mode, 0, count));
 }
 
-void RendererDraw(DrawMode mode, const Vertex* vertices, u32 count, Texture2D texture, Mat4 transformMatrix)
+void RendererDraw(DrawMode mode, const Vertex* vertices, u32 count, const Texture2D* texture, Mat4 transformMatrix)
 {
+    SASSERT_MSG(vertices, "vertices can't be null");
+
     VertexArray va = VertexArrayInit();
     VertexArrayBind(va);
     VertexBuffer vb = VertexBufferInit(vertices, count);

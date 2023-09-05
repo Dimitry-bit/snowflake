@@ -5,37 +5,26 @@
 #include "srenderer.h"
 #include "utils/utils.h"
 
-struct SAPI Glyph {
-    u32 width;
-    u32 height;
-    i32 bearingX;
-    i32 bearingY;
-    u32 advance;
-    Image bitmap;
-};
+struct SAPI Font;
+struct SAPI Text;
 
-struct SAPI Font {
-    u32 baseSize;
-    i32 glyphCount;
-    Glyph* glyphTable;
-    Texture2D texture;
-    Rectanglei* texRects;
-};
+SAPI Font* FontLoadFromFile(const char* filePath, u32 baseSize = 48);
+SAPI void FontUnload(Font** font);
 
-struct SAPI Text {
-    const Font* font;
-    char* string;
-    u32 characterSize;
-    Color fillColor;
-};
+SAPI const char* FontGetFamilyName(const Font* font);
+SAPI u32 FontGetBaseSize(const Font* font);
 
-SAPI Font FontLoadFromFile(const char* filePath, u32 baseSize = 48);
-SAPI void FontUnload(Font* font);
+SAPI Text* TextCreate(const Font* font, Color color = WHITE);
+SAPI void TextDelete(Text** text);
 
-SAPI void DrawText(Text text, Vec2 pos);
-
-SAPI Text TextCreate(const Font* font, Color color = WHITE);
-SAPI void TextDelete(Text* text);
+SAPI void TextSetFont(Text* text, const Font* font);
+SAPI const Font* TextGetFont(const Text* text);
 SAPI void TextSetCharacterSize(Text* text, u32 size);
+SAPI u32 TextGetCharacterSize(const Text* text);
 SAPI void TextSetString(Text* text, const char* string);
 SAPI void TextSetString(Text* text, StringViewer stringViewer);
+SAPI const char* TextGetString(const Text* text);
+SAPI void TextSetColor(Text* text, Color color);
+SAPI Color TextGetColor(Text* text);
+
+SAPI void DrawText(const Text* text, Vec2 pos);

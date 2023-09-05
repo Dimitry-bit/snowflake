@@ -18,10 +18,19 @@ int main()
         return -1;
     }
 
-    Texture2D tex = TextureLoadFromFile("../resources/RPGpack_sheet.bmp");
-    Font font = FontLoadFromFile("../resources/IBMPlexSans-Regular.ttf", 48);
-    Text testText = TextCreate(&font);
-    TextSetString(&testText, "Potato Man Strikes Again");
+    Texture2D* tex = TextureLoadFromFile("../resources/RPGpack_sheet.bmp");
+    if (!tex) {
+        tex = TextureCreate(2, 2, MAGENTA);
+        // Handle error
+    }
+
+    Font* font = FontLoadFromFile("../resources/IBMPlexSans-Regular.ttf", 48);
+    if (!font) {
+        // Handle error
+    }
+
+    Text* testText = TextCreate(font);
+    TextSetString(testText, "Potato Man Strikes Again");
 
     LOG_INFO(SMemUsage());
 
@@ -41,7 +50,7 @@ int main()
 
         TestInput();
 //        TestPrimitiveShapes();
-        TestTextureDrawing(&tex);
+        TestTextureDrawing(tex);
 
         DrawText(testText, Vec2{ 100, 100 });
 
@@ -143,18 +152,19 @@ static void TestTextureDrawing(const Texture2D* texture)
     const i32 mapWidth = 19;
     const i32 mapHeight = 7;
 
-    f32 width = (f32) ground.rect.width;
-    f32 height = (f32) ground.rect.height;
+    Rectanglei groundRect = ground.rect;
+    f32 width = (f32) groundRect.width;
+    f32 height = (f32) groundRect.height;
 
     for (i32 y = 0; y < mapHeight; y++) {
         for (i32 x = 0; x < mapWidth; x++) {
             Sprite tile = SpriteCreate(Vec2{ x * width, y * height }, nullptr);
             char tileID = map[x + y * mapWidth];
             if (tileID == 'W') {
-                SpriteSetTexture(&tile, &water, true);
+                SpriteSetTexture(&tile, water, true);
                 DrawSpritePro(&tile);
             } else {
-                SpriteSetTexture(&tile, &ground, true);
+                SpriteSetTexture(&tile, ground, true);
                 DrawSpritePro(&tile);
             }
         }
@@ -165,10 +175,10 @@ static void TestTextureDrawing(const Texture2D* texture)
             Sprite tile = SpriteCreate(Vec2{ x * width, y * height }, nullptr);
             char tileID = map[x + y * mapWidth];
             if (tileID == 'T') {
-                SpriteSetTexture(&tile, &tree, true);
+                SpriteSetTexture(&tile, tree, true);
                 DrawSpritePro(&tile);
             } else if (tileID == 'B') {
-                SpriteSetTexture(&tile, &barrel, true);
+                SpriteSetTexture(&tile, barrel, true);
                 DrawSpritePro(&tile);
             }
         }

@@ -23,18 +23,9 @@ enum SAPI TextureWraps {
     TEXTURE_WRAP_MIRROR_CLAMP
 };
 
-struct SAPI Texture2D {
-    u32 rendererID;
-    i32 mipmaps;
-    i32 width, height;
-    i32 format;
-};
-
-struct SAPI Image {
-    i32 width, height;
-    i32 format;
-    u8* pixels;
-};
+struct SAPI Texture2D;
+struct SAPI Image;
+struct SAPI SubTexture2D;
 
 struct SAPI Rectanglef {
     f32 left, top, width, height;
@@ -49,20 +40,32 @@ struct SAPI SubTexture2D {
     Rectanglei rect;
 };
 
-SAPI Texture2D TextureCreate(i32 width, i32 height, Color color);
-SAPI Texture2D TextureLoadFromMemory(const u8* pixels, i32 width, i32 height);
-SAPI Texture2D TextureLoadFromFile(const char* filePath);
-SAPI Texture2D TextureLoadFromImage(const Image* image);
-SAPI void TextureUnload(Texture2D* texture);
-SAPI void TextureBind(Texture2D texture, i32 slot);
+SAPI Texture2D* TextureCreate(i32 width, i32 height, Color color);
+SAPI Texture2D* TextureLoadFromMemory(const u8* pixels, i32 width, i32 height);
+SAPI Texture2D* TextureLoadFromFile(const char* filePath);
+SAPI Texture2D* TextureLoadFromImage(const Image* image);
+SAPI void TextureUpdatePixels(Texture2D* texture, const u8* pixels, i32 xOffset, i32 yOffset, u32 width, u32 height);
+SAPI void TextureUnload(Texture2D** texture);
+SAPI void TextureBind(const Texture2D* texture, i32 slot);
 SAPI void TextureUnbind();
-SAPI void TextureSetFilter(Texture2D texture, TextureFilter filter);
-SAPI void TextureSetWrap(Texture2D texture, TextureWrap wrap);
-SAPI void TextureGenerateMipmap(Texture2D texture);
 
-SAPI Image ImageCreate(i32 width, i32 height, Color color);
-SAPI Image ImageLoadFromMemory(const u8* pixels, i32 width, i32 height);
-SAPI Image ImageLoadFromFile(const char* filePath);
-SAPI void ImageUnload(Image* image);
+SAPI Vec2 TextureGetSize(const Texture2D* texture);
+SAPI Rectanglei TextureGetTextureRect(const Texture2D* texture);
+SAPI i32 TextureGetPixelFormat(const Texture2D* texture);
+SAPI void TextureSetFilter(Texture2D* texture, TextureFilter filter);
+SAPI bool8 TextureGetFilter(const Texture2D* texture, i32* outFilterMode);
+SAPI void TextureSetWrap(Texture2D* texture, TextureWrap wrap);
+SAPI TextureWrap TextureGetWrap(const Texture2D* texture);
+SAPI i32 TextureGenerateMipmap(Texture2D* texture);
+SAPI i32 TextureGetMipmapLevel(const Texture2D* texture);
+
+SAPI Image* ImageCreate(i32 width, i32 height, Color color);
+SAPI Image* ImageLoadFromMemory(const u8* pixels, i32 width, i32 height);
+SAPI Image* ImageLoadFromFile(char* filePath);
+SAPI void ImageUnload(Image** image);
+
+SAPI Vec2 ImageGetSize(const Image* image);
+SAPI i32 ImageGetPixelFormat(const Image* image);
+SAPI u8* ImageGetPixels(const Image* image);
 
 SAPI SubTexture2D SubTexture2DCreate(const Texture2D* texture, Vec2 pos, Vec2 cellSize, Vec2 spriteSize);

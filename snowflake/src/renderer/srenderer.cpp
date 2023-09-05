@@ -29,7 +29,8 @@ void DrawPixel(Vec2 pos, Color color)
     Vec4 colorNormalized = ColorNormalize(color);
     ShaderSetUniformVec4(*ShaderGetBound(), "uColor", colorNormalized);
 
-    Texture2D texture = TextureCreate(1, 1, WHITE);
+    Texture2D* texture = TextureCreate(2, 2, WHITE);
+    SASSERT(texture);
 
     RendererDraw(POINTS, vertices, 1, texture, Matrix4Identity());
 
@@ -48,7 +49,8 @@ void DrawLine(Vec2 startPos, Vec2 endPos, f32 width, Color color)
 
     GLCall(glLineWidth(width));
 
-    Texture2D texture = TextureCreate(1, 1, WHITE);
+    Texture2D* texture = TextureCreate(2, 2, WHITE);
+    SASSERT(texture);
 
     RendererDraw(LINES, vertices, 2, texture, Matrix4Identity());
 
@@ -66,7 +68,8 @@ void DrawTriangle(Vec2 v1, Vec2 v2, Vec2 v3, Color color)
     Vec4 colorNormalized = ColorNormalize(color);
     ShaderSetUniformVec4(*ShaderGetBound(), "uColor", colorNormalized);
 
-    Texture2D texture = TextureCreate(1, 1, WHITE);
+    Texture2D* texture = TextureCreate(2, 2, WHITE);
+    SASSERT(texture);
 
     RendererDraw(TRIANGLES, vertices, 3, texture, Matrix4Identity());
 
@@ -92,7 +95,8 @@ void DrawCirclePro(Mat4 transformMatrix, i32 pointCount, Color color)
     Vec4 colorNormalized = ColorNormalize(color);
     ShaderSetUniformVec4(*ShaderGetBound(), "uColor", colorNormalized);
 
-    Texture2D texture = TextureCreate(1, 1, WHITE);
+    Texture2D* texture = TextureCreate(2, 2, WHITE);
+    SASSERT(texture);
 
     RendererDraw(TRIANGLE_FAN, vertices, vertexCount, texture, transformMatrix);
 
@@ -126,7 +130,8 @@ void DrawEllipsePro(Mat4 transformMatrix, i32 pointCount, Color color)
     Vec4 colorNormalized = ColorNormalize(color);
     ShaderSetUniformVec4(*ShaderGetBound(), "uColor", colorNormalized);
 
-    Texture2D texture = TextureCreate(1, 1, WHITE);
+    Texture2D* texture = TextureCreate(2, 2, WHITE);
+    SASSERT(texture);
 
     RendererDraw(TRIANGLE_FAN, vertices, vertexCount, texture, transformMatrix);
 
@@ -191,7 +196,8 @@ void DrawRingPro(Mat4 transformMatrix, f32 innerRadius, f32 outerRadius, i32 qua
     Vec4 colorNormalized = ColorNormalize(color);
     ShaderSetUniformVec4(*ShaderGetBound(), "uColor", colorNormalized);
 
-    Texture2D texture = TextureCreate(1, 1, WHITE);
+    Texture2D* texture = TextureCreate(2, 2, WHITE);
+    SASSERT(texture);
 
     RendererDraw(TRIANGLES, vertices, 6 * quadCount, texture, transformMatrix);
 
@@ -220,7 +226,8 @@ void DrawRectanglePro(Mat4 transformMatrix, Color color)
     Vec4 colorNormalized = ColorNormalize(color);
     ShaderSetUniformVec4(*ShaderGetBound(), "uColor", colorNormalized);
 
-    Texture2D texture = TextureCreate(1, 1, WHITE);
+    Texture2D* texture = TextureCreate(2, 2, WHITE);
+    SASSERT(texture);
 
     RendererDraw(TRIANGLES, vertices, 6, texture, transformMatrix);
 
@@ -235,14 +242,17 @@ void DrawRectangle(Vec2 pos, Vec2 size, f32 rotation, Color color)
     DrawRectanglePro(transformMatrix, color);
 }
 
-void DrawSpritePro(Texture2D texture, Rectanglei texRect, Mat4 transformMatrix, Color tint)
+void DrawSpritePro(const Texture2D* texture, Rectanglei texRect, Mat4 transformMatrix, Color tint)
 {
-    f32 texCoordLeft = (f32) texRect.left / (f32) texture.width;
-    f32 texCoordRight = (f32) (texRect.left + texRect.width) / (f32) texture.width;
+    SASSERT_MSG(texture, "texture can't be null");
+
+    Vec2 textureSize = TextureGetSize(texture);
+    f32 texCoordLeft = (f32) texRect.left / (f32) textureSize.x;
+    f32 texCoordRight = (f32) (texRect.left + texRect.width) / (f32) textureSize.x;
 
     // NOTE(Tony): texture is vertically flipped
-    f32 texCoordBottom = (f32) texRect.top / (f32) texture.height;
-    f32 texCoordTop = (f32) (texRect.top + texRect.height) / (f32) texture.height;
+    f32 texCoordBottom = (f32) texRect.top / (f32) textureSize.y;
+    f32 texCoordTop = (f32) (texRect.top + texRect.height) / (f32) textureSize.y;
 
     Vertex vertices[] = {
         { Vec2{ 0, 1 }, Vec2{ texCoordLeft, texCoordTop } },
@@ -261,19 +271,22 @@ void DrawSpritePro(Texture2D texture, Rectanglei texRect, Mat4 transformMatrix, 
 
 void DrawSprite(SubTexture2D subTexture, Vec2 pos, f32 rotation, Color tint)
 {
+    const Texture2D* texture = subTexture.texture;
+    Rectanglei textCoord = subTexture.rect;
     Transform transform = TransformCreate(Vector3(pos, 0.0f),
                                           Vec3{ 0.0f, 0.0f, rotation },
-                                          Vec3{ (f32) subTexture.rect.width, (f32) subTexture.rect.height, 1.0f });
+                                          Vec3{ (f32) textCoord.width, (f32) textCoord.height, 1.0f });
     Mat4 transformMatrix = TransformGenerateMatrix(&transform);
-    DrawSpritePro(*subTexture.texture, subTexture.rect, transformMatrix, tint);
+    DrawSpritePro(texture, textCoord, transformMatrix, tint);
 }
 
-void DrawSprite(Texture2D texture, Vec2 pos, f32 rotation, Color tint)
+void DrawSprite(const Texture2D* texture, Vec2 pos, f32 rotation, Color tint)
 {
-    Transform transform = TransformCreate(Vector3(pos, 0.0f),
-                                          Vec3{ 0.0f, 0.0f, rotation },
-                                          Vec3{ (f32) texture.width, (f32) texture.height, 1.0f });
+    SASSERT_MSG(texture, "texture can't be null");
+
+    Vec2 textureSize = TextureGetSize(texture);
+    Rectanglei texCoord = TextureGetTextureRect(texture);
+    Transform transform = TransformCreate(Vector3(pos, 0.0f), Vec3{ 0.0f, 0.0f, rotation }, Vector3(textureSize, 1.0f));
     Mat4 transformMatrix = TransformGenerateMatrix(&transform);
-    Rectanglei texCoord = { 0, 0, texture.width, texture.height };
     DrawSpritePro(texture, texCoord, transformMatrix, tint);
 }

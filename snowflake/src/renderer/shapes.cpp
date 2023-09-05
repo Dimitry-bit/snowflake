@@ -17,8 +17,7 @@ Mat4 TransformGenerateMatrix(const Transform* transform)
 {
     SASSERT(transform);
 
-    Mat4 result = { };
-    result = Matrix4Identity();
+    Mat4 result = Matrix4Identity();
     result = MatrixTranslate(result, transform->position);
     // TODO(Tony): Transform euler angles to rotations;
     result = MatrixRotate(result, transform->rotation.z, Vec3{ 0.0f, 0.0f, 1.0f });
@@ -94,10 +93,10 @@ Sprite SpriteCreate(Vec2 pos, const Texture2D* texture)
     Sprite sprite = { };
     sprite.tint = WHITE;
     sprite.transform = TransformCreate(Vector3(pos, 0.0f));
-    sprite.texture = texture;
 
     if (texture) {
-        sprite.textureRect = Rectanglei{ 0, 0, texture->width, texture->height };
+        sprite.texture = texture;
+        sprite.textureRect = TextureGetTextureRect(texture);
     }
 
     return sprite;
@@ -121,37 +120,28 @@ void SpriteSetTexture(Sprite* sprite, const Texture2D* texture, bool8 resetRect)
 {
     SASSERT(sprite);
 
-    sprite->texture = texture;
+    if (texture) {
+        sprite->texture = texture;
+    }
 
-    if (!resetRect) {
+    if (resetRect) {
         return;
     }
 
     if (texture) {
-        sprite->textureRect = Rectanglei{ 0, 0, texture->width, texture->height };
+        sprite->textureRect = TextureGetTextureRect(texture);
     } else {
         sprite->textureRect = Rectanglei{ };
     }
 }
 
-void SpriteSetTexture(Sprite* sprite, const SubTexture2D* subTexture, bool8 resetRect)
+void SpriteSetTexture(Sprite* sprite, SubTexture2D subTexture, bool8 resetRect)
 {
     SASSERT(sprite);
 
-    if (subTexture) {
-        sprite->texture = subTexture->texture;
-    } else {
-        sprite->texture = nullptr;
-    }
-
-    if (!resetRect) {
-        return;
-    }
-
-    if (subTexture) {
-        sprite->textureRect = subTexture->rect;
-    } else {
-        sprite->textureRect = Rectanglei{ };
+    sprite->texture = subTexture.texture;
+    if (resetRect) {
+        sprite->textureRect = subTexture.rect;
     }
 }
 
@@ -187,5 +177,5 @@ void DrawSpritePro(const Sprite* sprite)
     Mat4 transformMatrix = TransformGenerateMatrix(&sprite->transform);
     transformMatrix = MatrixScale(transformMatrix, Vec3{ (f32) sprite->textureRect.width,
                                                          (f32) sprite->textureRect.height, 1.0f });
-    DrawSpritePro(*sprite->texture, sprite->textureRect, transformMatrix, sprite->tint);
+    DrawSpritePro(sprite->texture, sprite->textureRect, transformMatrix, sprite->tint);
 }
